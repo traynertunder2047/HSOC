@@ -1,3 +1,3 @@
 # protocols/ipc
 
-Contratti IPC locale dashboard-servizio per la V1.
+V1 local dashboard-service IPC contracts.

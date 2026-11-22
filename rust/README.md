@@ -1,3 +1,3 @@
 # rust
 
-Moduli Rust specialistici di sicurezza. Definire prima contratto, confini FFI/IPC, test e packaging.
+Specialist Rust security modules. Define contract, FFI/IPC boundaries, tests, and packaging first.

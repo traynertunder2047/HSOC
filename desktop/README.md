@@ -1,3 +1,3 @@
 # desktop
 
-Applicazione desktop Tauri + React + TypeScript. La shell Tauri è in src-tauri/ e resta distinta da /rust.
+Tauri + React + TypeScript desktop application. The Tauri shell lives in src-tauri/ and stays distinct from /rust.

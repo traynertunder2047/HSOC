@@ -1,20 +1,20 @@
 # Contributing
 
-1. Aprire o collegare una issue/requisito.
-2. Creare un branch descrittivo.
-3. Limitare la Pull Request a uno scopo.
-4. Aggiungere/aggiornare test e documentazione.
-5. Aggiornare la matrice di tracciabilità quando cambia un requisito.
-6. Non includere segreti, dati personali o database locali.
-7. Attendere i controlli CI e la review prima del merge.
+1. Open or link an issue/requirement.
+2. Create a descriptive branch.
+3. Keep the Pull Request limited to a single purpose.
+4. Add/update tests and documentation.
+5. Update the traceability matrix when a requirement changes.
+6. Do not include secrets, personal data, or local databases.
+7. Wait for CI checks and review before merging.
 
 ## Stack
-- Go: core e accesso SQLite.
-- Rust: moduli specialistici di sicurezza.
-- Python: worker/analisi ausiliarie.
+- Go: core and SQLite access.
+- Rust: specialist security modules.
+- Python: worker/auxiliary analysis.
 - Tauri + React + TypeScript: dashboard.
 
-I moduli Rust/Python non accedono direttamente a SQLite. Docker è facoltativo e destinato a sviluppo/test.
+Rust/Python modules do not access SQLite directly. Docker is optional and intended for development/testing.
 
-## Licenza
-I contributi al progetto sono proposti sotto la licenza MIT del repository, fatte salve le condizioni applicabili e gli avvisi di terze parti.
+## License
+Contributions to the project are proposed under the repository MIT license, subject to the applicable conditions and third-party notices.

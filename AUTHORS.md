@@ -1,3 +1,3 @@
 # Authors
 
-Elenco degli autori e contributori da mantenere durante lo sviluppo. Aggiungere solo persone che abbiano effettivamente contribuito e acconsentito all'attribuzione.
+List of authors and contributors to be maintained during development. Add only people who have actually contributed and agreed to attribution.

@@ -1,70 +1,70 @@
-# HSOC — Riepilogo generale completo
+# HSOC — Complete Master Summary
 
-**Versione:** 1.1-draft | **Data:** 2026-11-15  
-**Scopo:** documento di orientamento unico per sviluppo, test e manutenzione.
+**Version:** 1.1-draft | **Date:** 2026-11-15  
+**Purpose:** single orientation document for development, testing, and maintenance.
 
-## 1. Visione
+## 1. Vision
 
-HSOC è un centro di sicurezza informatica domestico, desktop e local-first. La V1 protegge e osserva principalmente il computer su cui è installato; la visibilità IoT è limitata ai dati accessibili senza hardware aggiuntivo e senza scansioni intrusive.
+HSOC is a home cybersecurity center, desktop and local-first. V1 primarily protects and observes the computer it is installed on; IoT visibility is limited to data accessible without additional hardware and without intrusive scans.
 
-Obiettivo: rendere disponibili inventario, eventi, rilevamenti, incidenti, stato e backup in un'interfaccia comprensibile, senza costi obbligatori di server/cloud.
+Objective: make inventory, events, detections, incidents, status, and backups available in an understandable interface, without mandatory server/cloud costs.
 
-## 2. Vincoli confermati
+## 2. Confirmed constraints
 
-- Costo obiettivo: €0 per il funzionamento base.
-- Nessun hardware esterno richiesto.
-- Nessuna telecamera o sensore obbligatorio.
-- Nessun login HSOC dedicato nella V1.
-- Desktop, modalità mista: servizio background + dashboard on demand.
-- Windows prima; Linux/macOS dopo.
-- Un solo agente principale in V1; agenti remoti in V2+.
-- Risposta ibrida conservativa.
-- Privilegi minimi.
-- Dati locali con backup.
-- Telegram opzionale.
-- Controllo vulnerabilità mensile e fuori ciclo per criticità.
-- Auto-fix soltanto come patch proposta, testata e revisionata da una persona.
+- Target cost: €0 for basic operation.
+- No external hardware required.
+- No mandatory camera or sensor.
+- No dedicated HSOC login in V1.
+- Desktop, mixed mode: background service + on-demand dashboard.
+- Windows first; Linux/macOS later.
+- A single main agent in V1; remote agents in V2+.
+- Conservative hybrid response.
+- Least privilege.
+- Local data with backup.
+- Optional Telegram.
+- Monthly vulnerability checks and off-cycle checks for critical issues.
+- Auto-fix only as a proposed patch, tested and reviewed by a person.
 
-## 3. Funzionalità
+## 3. Functionality
 
 ### Core
-- Lifecycle servizio e health monitor.
-- Raccolta eventi OS supportati.
-- Validazione e normalizzazione.
-- Storage SQLite.
-- Regole detection versionate.
-- Dedup e correlazione.
+- Service lifecycle and health monitor.
+- Collection of supported OS events.
+- Validation and normalization.
+- SQLite storage.
+- Versioned detection rules.
+- Dedup and correlation.
 - Incident management.
 - Dashboard.
-- Audit e diagnostica.
+- Audit and diagnostics.
 
-### Sicurezza e manutenzione
-- Inventario software.
+### Security and maintenance
+- Software inventory.
 - Vulnerability checks.
-- Dependency scan e SBOM.
+- Dependency scan and SBOM.
 - Backup/restore.
-- Firma e verifica aggiornamenti.
-- Config e policy validate.
-- Test e metriche detection.
+- Update signing and verification.
+- Validated config and policy.
+- Detection tests and metrics.
 
-### Opzionali
-- Telegram, disattivato inizialmente.
-- Moduli Rust specialistici di sicurezza e worker Python di analisi ausiliaria, integrati per fasi.
-- Simulazione di risposta.
+### Optional
+- Telegram, disabled initially.
+- Specialist Rust security modules and Python auxiliary analysis workers, integrated in phases.
+- Response simulation.
 
 ### Future V2+
-- Agenti remoti.
-- Enrollment, identità e revoca.
-- Coordinatore e sync.
-- Linux e macOS.
-- Policy distribuite.
+- Remote agents.
+- Enrollment, identity, and revocation.
+- Coordinator and sync.
+- Linux and macOS.
+- Distributed policies.
 
-## 4. Architettura
+## 4. Architecture
 
 ```text
 Tauri + React + TypeScript
         |
-        | IPC locale autorizzato
+        | authorized local IPC
         v
 HSOC Service (Go)
   |-- service/lifecycle/health
@@ -78,49 +78,49 @@ HSOC Service (Go)
   |-- backup/restore
   |
   v
-SQLite (scrittura esclusiva Go)
+SQLite (Go exclusive writer)
 
 OS adapters: Windows first
-Credential Store OS: segreti
-Rust: moduli specialistici di sicurezza; Python: worker/analisi ausiliarie; entrambi isolati e senza accesso diretto al DB
+OS Credential Store: secrets
+Rust: specialist security modules; Python: workers/auxiliary analysis; both isolated and without direct DB access
 ```
 
-## 5. Stack linguaggi
+## 5. Language stack
 
-| Linguaggio/tecnologia | Ruolo | Obbligatorietà |
+| Language/technology | Role | Mandatory |
 |---|---|---|
-| Go | Core e servizio | Obbligatorio |
-| Tauri | Shell desktop | Obbligatorio per UI desktop |
-| React | UI | Obbligatorio nella proposta |
-| TypeScript | UI tipizzata | Obbligatorio nella proposta |
-| SQLite | Database | Obbligatorio V1 |
-| Rust | Moduli specialistici di sicurezza | Linguaggio approvato; integrazione per fasi |
-| Python | Worker e analisi ausiliarie | Linguaggio approvato; integrazione per fasi |
-| SQL | Schema e query | Necessario per storage |
+| Go | Core and service | Mandatory |
+| Tauri | Desktop shell | Mandatory for the desktop UI |
+| React | UI | Mandatory in the proposal |
+| TypeScript | Typed UI | Mandatory in the proposal |
+| SQLite | Database | Mandatory in V1 |
+| Rust | Specialist security modules | Approved language; phased integration |
+| Python | Workers and auxiliary analysis | Approved language; phased integration |
+| SQL | Schema and queries | Required for storage |
 
-Regola: non aggiungere runtime solo per preferenza. Ogni linguaggio extra deve risolvere un requisito e avere un costo di packaging/manutenzione giustificato.
+Rule: do not add runtimes just as a preference. Every extra language must solve a requirement and have a justified packaging/maintenance cost.
 
-## 6. Struttura repository
+## 6. Repository structure
 
 ```text
 HSOC/
 ├── .github/workflows/       # CI Go/Rust/Python/dashboard, security, release
-├── cmd/                     # entry point Go
-├── internal/                # core Go e moduli applicativi
-├── rust/                    # moduli specialistici di sicurezza
-├── python/                  # worker e analisi ausiliarie
+├── cmd/                     # Go entry points
+├── internal/                # Go core and application modules
+├── rust/                    # specialist security modules
+├── python/                  # workers and auxiliary analysis
 ├── desktop/
 │   ├── src/                 # React + TypeScript
-│   └── src-tauri/           # shell Tauri
+│   └── src-tauri/           # Tauri shell
 ├── database/                # schema, migrations, queries
-├── protocols/               # IPC, eventi, messaggi e schemi
-├── rules/                   # detection, correlazione, IoT, vulnerabilità
-├── configs/                 # default e configurazioni piattaforma
-├── installers/windows/      # packaging iniziale
-├── scripts/                 # build, test, sviluppo e release
+├── protocols/               # IPC, events, messages, and schemas
+├── rules/                   # detection, correlation, IoT, vulnerability
+├── configs/                 # defaults and platform configurations
+├── installers/windows/      # initial packaging
+├── scripts/                 # build, test, development, and release
 ├── tests/                   # unit, integration, system, security, recovery
-├── docker/                  # facoltativo: sviluppo/test
-├── docs/                    # documentazione e ADR
+├── docker/                  # optional: development/testing
+├── docs/                    # documentation and ADRs
 ├── README.md
 ├── LICENSE                  # MIT
 ├── SECURITY.md
@@ -129,154 +129,154 @@ HSOC/
 └── go.sum
 ```
 
-La V1 è locale e Windows-first. Le cartelle si creano quando i relativi moduli vengono implementati; non si aggiungono directory vuote. Gli agenti remoti sono una funzionalità V2+.
+V1 is local and Windows-first. Folders are created when the corresponding modules are implemented; no empty directories are added. Remote agents are a V2+ feature.
 
-## 7. Regole di sviluppo essenziali
+## 7. Essential development rules
 
-1. Go è l'autorità centrale.
-2. Solo Go scrive SQLite.
-3. UI comunica via IPC e non legge file DB.
-4. IPC protetto da ACL e autorizzazione per operazione.
-5. Minimo privilegio.
-6. Input sempre validato.
-7. Nessun comando arbitrario da input o notifiche.
-8. Segreti solo in Credential Store.
-9. Telegram e auto-response OFF per default.
-10. Agenti remoti esclusi dalla V1.
-11. Ogni regola detection ha test positivi e negativi.
-12. Ogni modifica aggiorna test, documentazione e matrice.
-13. CI verde e review prima del merge.
-14. Nessuna dichiarazione PASS senza evidenza.
+1. Go is the central authority.
+2. Only Go writes to SQLite.
+3. The UI communicates via IPC and does not read DB files.
+4. IPC protected by ACLs and per-operation authorization.
+5. Least privilege.
+6. Input always validated.
+7. No arbitrary commands from input or notifications.
+8. Secrets only in the Credential Store.
+9. Telegram and auto-response OFF by default.
+10. Remote agents excluded from V1.
+11. Every detection rule has positive and negative tests.
+12. Every change updates tests, documentation, and the matrix.
+13. Green CI and review before merging.
+14. No PASS claim without evidence.
 
-Consultare `13_DEVELOPMENT_RULES.md` per il regolamento completo.
+Consult `13_DEVELOPMENT_RULES.md` for the complete rulebook.
 
-## 8. Strategia test
+## 8. Test strategy
 
-- Unit: funzioni, parser, regole, config, repository.
-- Integration: IPC, DB, migrazioni, notifiche mock.
-- System: flussi end-to-end e UI.
-- Security: ACL, input, segreti, update, least privilege.
+- Unit: functions, parsers, rules, config, repositories.
+- Integration: IPC, DB, migrations, mock notifications.
+- System: end-to-end flows and UI.
+- Security: ACLs, input, secrets, updates, least privilege.
 - Recovery: backup, restore, crash, disk full.
-- Performance: CPU/RAM, throughput, latenza e crescita DB.
+- Performance: CPU/RAM, throughput, latency, and DB growth.
 - Detection quality: TP/FP/TN/FN, precision, recall, F1.
 - Deployment: install, upgrade, rollback, uninstall.
 
-Un test definito ma non eseguito è `NOT RUN`. Il risultato deve essere legato a commit, versione, ambiente ed evidenza.
+A test that is defined but not executed is `NOT RUN`. The result must be tied to a commit, version, environment, and evidence.
 
-## 9. Vertical slice MVP
+## 9. MVP vertical slice
 
-1. Fixture evento.
-2. Collector/ingest Go.
-3. Normalizzazione.
-4. Scrittura SQLite.
-5. Regola demo.
-6. Detection e incidente.
+1. Event fixture.
+2. Go collector/ingest.
+3. Normalization.
+4. SQLite write.
+5. Demo rule.
+6. Detection and incident.
 7. IPC.
 8. Dashboard.
-9. Restart e verifica integrità.
+9. Restart and integrity verification.
 
-Niente auto-response. La prima milestone è dimostrare un flusso completo e ripetibile, non implementare subito ogni feature.
+No auto-response. The first milestone is to demonstrate a complete, repeatable flow, not to implement every feature immediately.
 
 ## 10. Roadmap
 
-### Fase A — Fondazioni
-Repository, CI, decisioni ADR, logging, config, schema DB, service lifecycle.
+### Phase A — Foundations
+Repository, CI, ADR decisions, logging, config, DB schema, service lifecycle.
 
-### Fase B — MVP end-to-end
-IPC minimo, collector, normalizer, storage, detection demo, incident, UI.
+### Phase B — End-to-end MVP
+Minimal IPC, collector, normalizer, storage, demo detection, incident, UI.
 
-### Fase C — V1 robusta
-Dedup, correlazione, inventario, vulnerability checks, backup/restore, audit, diagnostics, installer.
+### Phase C — Robust V1
+Dedup, correlation, inventory, vulnerability checks, backup/restore, audit, diagnostics, installer.
 
-### Fase D — V1 estesa
-Telegram opt-in, simulation, miglioramenti detection, release pipeline e SBOM.
+### Phase D — Extended V1
+Telegram opt-in, simulation, detection improvements, release pipeline, and SBOM.
 
-### Fase E — V2+
-Linux/macOS, agenti remoti, identità, enrollment/revoca, sync e coordinamento.
+### Phase E — V2+
+Linux/macOS, remote agents, identity, enrollment/revocation, sync, and coordination.
 
-## 11. Test di release obbligatori
+## 11. Mandatory release tests
 
-- Test P0 superati.
-- Security test applicabili superati.
-- Installazione su OS supportati.
-- Update e rollback verificati.
-- Backup e restore dimostrati.
-- Nessun segreto in repo/log.
-- Dipendenze scansionate.
-- SBOM generata.
-- Known issues documentati.
-- Matrice tracciabilità aggiornata.
-- Nessun bug critico aperto senza accettazione del rischio.
+- P0 tests passed.
+- Applicable security tests passed.
+- Installation on supported OS versions.
+- Updates and rollback verified.
+- Backup and restore demonstrated.
+- No secrets in the repo/logs.
+- Dependencies scanned.
+- SBOM generated.
+- Known issues documented.
+- Traceability matrix updated.
+- No open critical bug without risk acceptance.
 
-## 12. Decisioni ancora aperte
+## 12. Still-open decisions
 
-- Named Pipes e modello ACL IPC.
-- Versioni Windows minime supportate.
-- Schema SQL definitivo e gestione dedup/null.
-- Config format e precedence.
-- Relazioni approvals/actions.
-- Retention e budget storage.
-- Protezione/cifratura backup.
-- Budget performance su macchina di riferimento.
-- Fonti eventi Windows da includere nell'MVP.
-- Confini FFI/IPC e packaging dei moduli Rust.
-- Isolamento, packaging e gestione errori dei worker Python.
+- Named Pipes and the IPC ACL model.
+- Minimum supported Windows versions.
+- Final SQL schema and dedup/null handling.
+- Config format and precedence.
+- Approvals/actions relationships.
+- Retention and storage budget.
+- Backup protection/encryption.
+- Performance budget on the reference machine.
+- Windows event sources to include in the MVP.
+- FFI/IPC boundaries and packaging of the Rust modules.
+- Isolation, packaging, and error handling of the Python workers.
 
-## 13. Proposte aggiuntive utili
+## 13. Additional useful proposals
 
-Le seguenti sono proposte, non requisiti già approvati:
+The following are proposals, not already approved requirements:
 
-1. **Modalità demo con dataset sintetico:** permette di esplorare dashboard e detection senza raccogliere dati reali.
-2. **Health score per copertura, non per “sicurezza assoluta”:** indicare fonti attive, ultime acquisizioni, controlli mancanti e qualità dei dati; evitare un punteggio che suggerisca protezione garantita.
-3. **Explainability per ogni alert:** “perché lo vedo”, dati usati, regola/versione e cosa non è stato verificato.
-4. **Registro delle modifiche (change journal):** timeline di configurazioni, aggiornamenti, regole e restore.
-5. **Export/import regole firmate:** utile per distribuire set di regole senza modificare il core, con firma, versione e test.
-6. **Test di backup automatico su copia isolata:** non basta creare il backup; verificare periodicamente che sia ripristinabile.
-7. **Budget risorse configurabile:** limiti a CPU, RAM, dimensione log e spazio DB, con comportamento degradato sicuro.
-8. **Privacy dashboard:** mostra cosa resta locale, cosa viene esportato e quali integrazioni sono attive.
-9. **Compatibilità router trasparente:** catalogare solo fonti/integrazioni testate, senza promettere visibilità universale.
-10. **Canary release e rollback:** riduce il rischio di aggiornamenti difettosi.
-11. **Dataset di regressione versionato:** consente di misurare se una modifica migliora o peggiora i falsi positivi.
-12. **Accessibilità UI:** navigazione tastiera, contrasto, descrizioni testuali e messaggi non basati solo sul colore.
+1. **Demo mode with a synthetic dataset:** allows exploring the dashboard and detections without collecting real data.
+2. **Health score for coverage, not for "absolute security":** indicate active sources, latest acquisitions, missing checks, and data quality; avoid a score that suggests guaranteed protection.
+3. **Explainability for every alert:** "why do I see this", data used, rule/version, and what has not been verified.
+4. **Change journal:** timeline of configurations, updates, rules, and restores.
+5. **Export/import of signed rules:** useful for distributing rule sets without modifying the core, with signature, version, and tests.
+6. **Automated backup test on an isolated copy:** creating the backup is not enough; periodically verify that it can be restored.
+7. **Configurable resource budget:** limits on CPU, RAM, log size, and DB space, with safe degraded behavior.
+8. **Privacy dashboard:** shows what stays local, what is exported, and which integrations are active.
+9. **Transparent router compatibility:** catalog only tested sources/integrations, without promising universal visibility.
+10. **Canary release and rollback:** reduces the risk of faulty updates.
+11. **Versioned regression dataset:** makes it possible to measure whether a change improves or worsens false positives.
+12. **UI accessibility:** keyboard navigation, contrast, textual descriptions, and messages not based on color alone.
 
-## 14. Rischi principali
+## 14. Main risks
 
-- Visibilità limitata su IoT/router consumer.
-- Falsi positivi e falsi negativi.
-- Privilegi eccessivi per fonti OS.
-- Complessità di update e migrazioni.
-- Backup apparentemente valido ma non ripristinabile.
-- Aumento della superficie per runtime multipli.
-- Dipendenza da servizi esterni per notifiche.
+- Limited visibility on consumer IoT/routers.
+- False positives and false negatives.
+- Excessive privileges for OS sources.
+- Complexity of updates and migrations.
+- Backup that appears valid but cannot be restored.
+- Increased attack surface from multiple runtimes.
+- Dependency on external services for notifications.
 
-Mitigare con scope realistico, test riproducibili, secure defaults e documentazione dei limiti.
+Mitigate with a realistic scope, reproducible tests, secure defaults, and documented limits.
 
-## 15. Regola conclusiva
+## 15. Concluding rule
 
-La qualità HSOC non si misura dal numero di feature, ma dalla correttezza del flusso dati, dalla sicurezza dei confini, dalla spiegabilità dei rilevamenti, dalla capacità di recupero e dalle prove verificabili. Ogni release deve dimostrare ciò che dichiara.
+HSOC quality is not measured by the number of features, but by the correctness of the data flow, the security of the boundaries, the explainability of detections, the ability to recover, and verifiable evidence. Every release must demonstrate what it claims.
 
-## Aggiornamento architetturale 1.1 – decisioni consolidate (15-11-2026)
+## Architectural update 1.1 – consolidated decisions (2026-11-15)
 
-Le seguenti decisioni prevalgono su eventuali formulazioni precedenti in questo documento:
+The following decisions supersede any earlier wording in this document:
 
-- **Licenza del progetto:** MIT. Il testo completo è nel file `LICENSE` alla radice del repository. Le licenze delle dipendenze restano da verificare e rispettare separatamente.
-- **Repository:** monorepo GitHub, con codice, documentazione, test e configurazioni di build nello stesso repository.
-- **Dashboard desktop:** Tauri + React + TypeScript. Il runtime Rust interno a Tauri è distinto dai moduli Rust specialistici HSOC.
-- **Stack applicativo:** Go + Rust + Python. Go è il core e l'unica autorità di scrittura su SQLite; Rust implementa componenti specialistici di sicurezza; Python implementa worker e attività ausiliarie di analisi. Le responsabilità devono restare separate e i confini tra processi/moduli documentati.
-- **Introduzione graduale:** i tre linguaggi fanno parte dello stack approvato, ma le rispettive componenti vengono integrate per fasi verticali verificabili; non si creano cartelle o moduli vuoti e un worker non deve diventare un punto singolo di guasto del core.
-- **Docker:** facoltativo, riservato ad ambienti di sviluppo/test o servizi ausiliari isolati. Non è prerequisito di installazione o funzionamento per l'utente HSOC.
-- **Agenti remoti:** esclusi dalla V1; progettazione e implementazione funzionale dalla V2+. Nella V1 si possono definire contratti e schemi versionati per evitare una futura riprogettazione, senza aprire listener remoti.
-- **Piattaforma iniziale:** Windows x86-64; Linux e macOS restano evoluzioni successive.
-- **Tracciabilità:** requisiti, documenti, componenti, test ed evidenze devono essere collegati nella matrice del Documento 14.
+- **Project license:** MIT. The full text is in the `LICENSE` file at the repository root. Dependency licenses must still be verified and respected separately.
+- **Repository:** GitHub monorepo, with code, documentation, tests, and build configurations in the same repository.
+- **Desktop dashboard:** Tauri + React + TypeScript. The Rust runtime inside Tauri is distinct from the HSOC specialist Rust modules.
+- **Application stack:** Go + Rust + Python. Go is the core and the sole authority for writing to SQLite; Rust implements specialist security components; Python implements workers and auxiliary analysis tasks. Responsibilities must remain separate and process/module boundaries documented.
+- **Gradual introduction:** the three languages are part of the approved stack, but their components are integrated in verifiable vertical phases; no empty folders or modules are created, and a worker must not become a single point of failure for the core.
+- **Docker:** optional, reserved for development/test environments or isolated auxiliary services. It is not a prerequisite for installation or operation for the HSOC user.
+- **Remote agents:** excluded from V1; design and functional implementation from V2+. V1 may define versioned contracts and schemas to avoid a future redesign, without opening remote listeners.
+- **Initial platform:** Windows x86-64; Linux and macOS remain subsequent evolutions.
+- **Traceability:** requirements, documents, components, tests, and evidence must be linked in the Document 14 matrix.
 
-Queste decisioni aggiornano la baseline progettuale, non attestano che codice, workflow CI, installer o test siano già stati implementati o verificati.
+These decisions update the design baseline; they do not attest that code, CI workflows, installers, or tests have already been implemented or verified.
 
-### Decisioni definitive aggiunte nella revisione 1.1
+### Final decisions added in revision 1.1
 
-- Licenza MIT.
-- Monorepo GitHub.
-- Dashboard Tauri + React + TypeScript.
-- Stack Go + Rust + Python: Go core e unico writer SQLite; Rust sicurezza specialistica; Python worker/analisi ausiliarie.
-- Docker facoltativo, solo sviluppo/test.
-- Agenti remoti implementati dalla V2, non nella V1.
-- Documento 16 dedicato a GitHub, CI/CD e DevSecOps.
+- MIT license.
+- GitHub monorepo.
+- Tauri + React + TypeScript dashboard.
+- Go + Rust + Python stack: Go core and sole SQLite writer; Rust specialist security; Python workers/auxiliary analysis.
+- Docker optional, development/testing only.
+- Remote agents implemented from V2, not in V1.
+- Document 16 dedicated to GitHub, CI/CD, and DevSecOps.

@@ -1,116 +1,116 @@
 # HSOC — Deployment & Installation
 
-**Versione:** 1.1-draft | **Target iniziale:** Windows x86-64
+**Version:** 1.1-draft | **Initial target:** Windows x86-64
 
-## 1. Obiettivo
+## 1. Objective
 
-Definire un'installazione ripetibile del servizio Go e della dashboard desktop. La versione iniziale non richiede hardware esterno né account cloud.
+Define a repeatable installation of the Go service and the desktop dashboard. The initial version requires neither external hardware nor a cloud account.
 
-## 2. Piattaforma
+## 2. Platform
 
-- Prima piattaforma: Windows x86-64.
-- Versioni Windows supportate: **DA CONFERMARE** con matrice testata.
-- Linux/macOS: V2+ dopo portabilità del core.
-- Non dichiarare supporto per versioni OS non testate.
+- First platform: Windows x86-64.
+- Supported Windows versions: **TO BE CONFIRMED** with a tested matrix.
+- Linux/macOS: V2+ after core portability.
+- Do not claim support for untested OS versions.
 
-## 3. Componenti distribuiti
+## 3. Distributed components
 
-- Servizio HSOC Go.
-- Dashboard Tauri.
-- Configurazione iniziale.
-- Schema/migrazioni SQLite.
-- Regole di rilevamento versionate.
-- Documentazione, licenze e SBOM.
-- Updater solo quando firma e rollback sono pronti.
+- HSOC Go service.
+- Tauri dashboard.
+- Initial configuration.
+- SQLite schema/migrations.
+- Versioned detection rules.
+- Documentation, licenses, and SBOM.
+- Updater only when signing and rollback are ready.
 
-## 4. Directory logiche
+## 4. Logical directories
 
-I path definitivi devono rispettare convenzioni Windows e ACL:
-- binari installati in directory protetta;
-- configurazione in area dedicata;
-- database e dati runtime in ProgramData o directory utente definita;
-- log separati dai segreti;
-- backup in destinazione scelta dall'utente;
-- cache temporanee separata dai dati persistenti.
+The final paths must follow Windows conventions and ACLs:
+- binaries installed in a protected directory;
+- configuration in a dedicated area;
+- database and runtime data in ProgramData or a defined user directory;
+- logs separated from secrets;
+- backups in a user-chosen destination;
+- temporary caches separate from persistent data.
 
-Non hardcodare path assoluti; usare API OS e testare ACL.
+Do not hardcode absolute paths; use OS APIs and test ACLs.
 
-## 5. Installazione
+## 5. Installation
 
-1. Verificare firma e integrità del pacchetto.
-2. Controllare OS e architettura.
-3. Creare directory con ACL minime.
-4. Installare binari e file di policy.
-5. Inizializzare DB e migrazioni.
-6. Registrare il servizio con account/privilegi minimi.
-7. Avviare servizio e controllare health.
-8. Avviare UI e verificare IPC.
-9. Mostrare stato iniziale e limiti della copertura.
-10. Non abilitare Telegram o auto-response senza opt-in.
+1. Verify the package signature and integrity.
+2. Check OS and architecture.
+3. Create directories with minimal ACLs.
+4. Install binaries and policy files.
+5. Initialize DB and migrations.
+6. Register the service with a minimal account/privileges.
+7. Start the service and check health.
+8. Start the UI and verify IPC.
+9. Show initial status and coverage limits.
+10. Do not enable Telegram or auto-response without opt-in.
 
-## 6. Aggiornamento
+## 6. Update
 
-- Pacchetto firmato e verificato.
-- Backup pre-update.
-- Controllo spazio e compatibilità.
-- Migrazione DB controllata.
-- Verifica health post-update.
-- Rollback del binario e restore DB se necessario.
-- Nessun update silenzioso che cambia policy sensibili.
+- Signed and verified package.
+- Pre-update backup.
+- Space and compatibility check.
+- Controlled DB migration.
+- Post-update health verification.
+- Binary rollback and DB restore if needed.
+- No silent update that changes sensitive policies.
 
-## 7. Disinstallazione
+## 7. Uninstallation
 
-- Arresto servizio.
-- Rimozione registrazione servizio e binari.
-- Dati utente conservati per default, con opzione esplicita per rimuoverli.
-- Prima di cancellare DB/backup, mostrare conseguenze e chiedere conferma.
-- Rimuovere credenziali dal Credential Store.
-- Registrare esito; non lasciare processi orfani.
+- Stop the service.
+- Remove service registration and binaries.
+- User data kept by default, with an explicit option to remove it.
+- Before deleting DB/backups, show the consequences and ask for confirmation.
+- Remove credentials from the Credential Store.
+- Record the outcome; do not leave orphan processes.
 
 ## 8. Recovery
 
-- Se servizio non parte, UI mostra istruzioni e correlation ID.
-- Se DB non valido, non sovrascriverlo automaticamente.
-- Proporre ripristino da backup verificato.
-- Conservare copia del DB problematico solo se l'utente lo autorizza e con protezione adeguata.
+- If the service does not start, the UI shows instructions and a correlation ID.
+- If the DB is invalid, do not overwrite it automatically.
+- Offer restore from a verified backup.
+- Keep a copy of the problematic DB only if the user authorizes it and with adequate protection.
 
-## 9. Test deployment
+## 9. Deployment tests
 
-| ID | Test | Risultato atteso |
+| ID | Test | Expected result |
 |---|---|---|
-| DEP-01 | Installazione pulita | Servizio e UI installati |
-| DEP-02 | OS non supportato | Installazione bloccata con messaggio |
-| DEP-03 | Firma pacchetto non valida | Installazione bloccata |
-| DEP-04 | ACL directory | Accesso limitato |
-| DEP-05 | Primo avvio | DB inizializzato, health OK |
-| DEP-06 | Riavvio Windows | Servizio recupera secondo policy |
-| DEP-07 | UI chiusa | Servizio continua senza crash |
-| DEP-08 | Aggiornamento N-1 → N | Dati preservati e health OK |
-| DEP-09 | Update interrotto | Recovery/rollback documentato |
-| DEP-10 | Spazio disco insufficiente | Errore gestito |
-| DEP-11 | Disinstallazione conserva dati | Dati presenti e servizio rimosso |
-| DEP-12 | Disinstallazione con rimozione dati | Solo dopo conferma |
-| DEP-13 | Reinstallazione con DB esistente | Nessuna sovrascrittura non autorizzata |
-| DEP-14 | Installazione senza hardware aggiuntivo | Funzioni core operative |
+| DEP-01 | Clean installation | Service and UI installed |
+| DEP-02 | Unsupported OS | Installation blocked with message |
+| DEP-03 | Invalid package signature | Installation blocked |
+| DEP-04 | Directory ACL | Access restricted |
+| DEP-05 | First start | DB initialized, health OK |
+| DEP-06 | Windows restart | Service recovers according to policy |
+| DEP-07 | UI closed | Service continues without crashing |
+| DEP-08 | Update N-1 → N | Data preserved and health OK |
+| DEP-09 | Interrupted update | Documented recovery/rollback |
+| DEP-10 | Insufficient disk space | Error handled |
+| DEP-11 | Uninstallation keeps data | Data present and service removed |
+| DEP-12 | Uninstallation with data removal | Only after confirmation |
+| DEP-13 | Reinstallation with an existing DB | No unauthorized overwrite |
+| DEP-14 | Installation without additional hardware | Core functions operational |
 
-## Aggiornamento architetturale 1.1 – decisioni consolidate (15-11-2026)
+## Architectural update 1.1 – consolidated decisions (2026-11-15)
 
-Le seguenti decisioni prevalgono su eventuali formulazioni precedenti in questo documento:
+The following decisions supersede any earlier wording in this document:
 
-- **Licenza del progetto:** MIT. Il testo completo è nel file `LICENSE` alla radice del repository. Le licenze delle dipendenze restano da verificare e rispettare separatamente.
-- **Repository:** monorepo GitHub, con codice, documentazione, test e configurazioni di build nello stesso repository.
-- **Dashboard desktop:** Tauri + React + TypeScript. Il runtime Rust interno a Tauri è distinto dai moduli Rust specialistici HSOC.
-- **Stack applicativo:** Go + Rust + Python. Go è il core e l'unica autorità di scrittura su SQLite; Rust implementa componenti specialistici di sicurezza; Python implementa worker e attività ausiliarie di analisi. Le responsabilità devono restare separate e i confini tra processi/moduli documentati.
-- **Introduzione graduale:** i tre linguaggi fanno parte dello stack approvato, ma le rispettive componenti vengono integrate per fasi verticali verificabili; non si creano cartelle o moduli vuoti e un worker non deve diventare un punto singolo di guasto del core.
-- **Docker:** facoltativo, riservato ad ambienti di sviluppo/test o servizi ausiliari isolati. Non è prerequisito di installazione o funzionamento per l'utente HSOC.
-- **Agenti remoti:** esclusi dalla V1; progettazione e implementazione funzionale dalla V2+. Nella V1 si possono definire contratti e schemi versionati per evitare una futura riprogettazione, senza aprire listener remoti.
-- **Piattaforma iniziale:** Windows x86-64; Linux e macOS restano evoluzioni successive.
-- **Tracciabilità:** requisiti, documenti, componenti, test ed evidenze devono essere collegati nella matrice del Documento 14.
+- **Project license:** MIT. The full text is in the `LICENSE` file at the repository root. Dependency licenses must still be verified and respected separately.
+- **Repository:** GitHub monorepo, with code, documentation, tests, and build configurations in the same repository.
+- **Desktop dashboard:** Tauri + React + TypeScript. The Rust runtime inside Tauri is distinct from the HSOC specialist Rust modules.
+- **Application stack:** Go + Rust + Python. Go is the core and the sole authority for writing to SQLite; Rust implements specialist security components; Python implements workers and auxiliary analysis tasks. Responsibilities must remain separate and process/module boundaries documented.
+- **Gradual introduction:** the three languages are part of the approved stack, but their components are integrated in verifiable vertical phases; no empty folders or modules are created, and a worker must not become a single point of failure for the core.
+- **Docker:** optional, reserved for development/test environments or isolated auxiliary services. It is not a prerequisite for installation or operation for the HSOC user.
+- **Remote agents:** excluded from V1; design and functional implementation from V2+. V1 may define versioned contracts and schemas to avoid a future redesign, without opening remote listeners.
+- **Initial platform:** Windows x86-64; Linux and macOS remain subsequent evolutions.
+- **Traceability:** requirements, documents, components, tests, and evidence must be linked in the Document 14 matrix.
 
-Queste decisioni aggiornano la baseline progettuale, non attestano che codice, workflow CI, installer o test siano già stati implementati o verificati.
+These decisions update the design baseline; they do not attest that code, CI workflows, installers, or tests have already been implemented or verified.
 
-### Packaging e runtime dei linguaggi
+### Language packaging and runtimes
 
-La distribuzione Windows deve includere i componenti runtime necessari per l'utente senza richiedere installazioni separate di Go, Rust, Python, Node.js o Docker. Il packaging dovrà incorporare l'eseguibile Go, i moduli Rust compilati e i worker Python con il runtime/deployment scelto e le relative dipendenze bloccate. La dashboard Tauri distribuisce gli asset React/TypeScript compilati.
+The Windows distribution must include the runtime components needed by the user without requiring separate installations of Go, Rust, Python, Node.js, or Docker. Packaging will need to bundle the Go executable, the compiled Rust modules, and the Python workers with the chosen runtime/deployment and their pinned dependencies. The Tauri dashboard distributes the compiled React/TypeScript assets.
 
-La modalità concreta di packaging dei worker Python e l'eventuale uso di processi separati sono decisioni tecniche da validare con prototipo. Docker non è incluso come requisito per l'installazione dell'utente.
+The concrete packaging mode for the Python workers and the possible use of separate processes are technical decisions to be validated with a prototype. Docker is not included as a requirement for user installation.

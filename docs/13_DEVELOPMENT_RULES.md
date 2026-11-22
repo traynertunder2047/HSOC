@@ -1,183 +1,183 @@
-# HSOC — Regole obbligatorie di sviluppo
+# HSOC — Mandatory Development Rules
 
-**Versione:** 1.1-draft | **Applicazione:** ogni contributo e modifica
+**Version:** 1.1-draft | **Applies to:** every contribution and change
 
-## 1. Regole architetturali
+## 1. Architectural rules
 
-1. Go è l'autorità centrale della V1.
-2. Solo Go scrive SQLite.
-3. UI comunica con Go via IPC documentato.
-4. Nessun modulo opzionale accede direttamente al DB.
-5. Lo stack approvato comprende Go, Rust e Python: Go è il core, Rust i moduli specialistici di sicurezza e Python i worker/analisi ausiliarie. L'integrazione avviene per fasi e con contratti testati.
-6. Agenti remoti non entrano nella V1.
-7. Non esporre porte di rete per default.
-8. Non introdurre hardware esterno obbligatorio.
+1. Go is the central authority of V1.
+2. Only Go writes to SQLite.
+3. The UI communicates with Go via documented IPC.
+4. No optional module accesses the DB directly.
+5. The approved stack includes Go, Rust, and Python: Go is the core, Rust the specialist security modules, and Python the workers/auxiliary analysis. Integration happens in phases and with tested contracts.
+6. Remote agents are not part of V1.
+7. Do not expose network ports by default.
+8. Do not introduce mandatory external hardware.
 
-## 2. Regole di sicurezza
+## 2. Security rules
 
-1. Minimo privilegio in ogni processo.
-2. Ogni input esterno è non fidato.
-3. Validare tipo, dimensione, encoding e range.
-4. Non eseguire comandi shell derivati da input.
-5. Non memorizzare segreti in chiaro in config, DB, log o repository.
-6. Usare Credential Store del sistema operativo.
-7. Redigere token e dati sensibili nei log.
-8. Default Telegram OFF.
-9. Default auto-response OFF.
-10. Operazioni sensibili autorizzate, confermate e auditate.
-11. Nessun aggiornamento non verificato.
-12. Fail-safe: in caso di errore, non applicare azioni rischiose.
+1. Least privilege in every process.
+2. Every external input is untrusted.
+3. Validate type, size, encoding, and range.
+4. Do not execute shell commands derived from input.
+5. Do not store secrets in plaintext in config, DB, logs, or the repository.
+6. Use the operating system Credential Store.
+7. Redact tokens and sensitive data in logs.
+8. Telegram default OFF.
+9. Auto-response default OFF.
+10. Sensitive operations authorized, confirmed, and audited.
+11. No unverified updates.
+12. Fail-safe: on error, do not apply risky actions.
 
-## 3. Regole Go
+## 3. Go rules
 
-- Formattare con `gofmt`.
-- Usare error wrapping e contesto.
-- Gestire context cancellation e timeout.
-- Evitare goroutine senza chiusura deterministica.
-- Non usare global state mutabile senza motivazione.
-- Repository layer unico per SQLite.
-- Transazioni per modifiche multi-entità.
-- Query parametrizzate.
-- Limiti a payload, batch e concorrenza.
-- Test unitari per logica e failure path.
+- Format with `gofmt`.
+- Use error wrapping and context.
+- Handle context cancellation and timeouts.
+- Avoid goroutines without deterministic shutdown.
+- Do not use mutable global state without justification.
+- Single repository layer for SQLite.
+- Transactions for multi-entity changes.
+- Parameterized queries.
+- Limits on payloads, batches, and concurrency.
+- Unit tests for logic and failure paths.
 
-## 4. Regole Rust
+## 4. Rust rules
 
-Applicabili a tutti i moduli Rust del progetto:
-- `cargo fmt --check`, `cargo clippy -- -D warnings` e `cargo test`;
-- gestione esplicita errori;
-- confine FFI/IPC ristretto e versionato;
-- nessun accesso DB;
-- nessun privilegio aggiuntivo implicito;
-- `cargo audit` e inventory dipendenze;
-- test su input malformato e panic boundary.
+Applicable to all Rust modules in the project:
+- `cargo fmt --check`, `cargo clippy -- -D warnings`, and `cargo test`;
+- explicit error handling;
+- narrow, versioned FFI/IPC boundary;
+- no DB access;
+- no implicit additional privileges;
+- `cargo audit` and dependency inventory;
+- tests on malformed input and panic boundaries.
 
-## 5. Regole Python
+## 5. Python rules
 
-Applicabili a tutti i worker e moduli Python del progetto:
-- ambiente isolato e lockfile;
-- `ruff`, `pytest` e `pip-audit`;
-- nessun accesso diretto al DB;
-- niente segreti in notebook/log;
-- niente esecuzione automatica di script generati;
-- input/output schema-validati;
-- Python non deve impedire il funzionamento del core.
+Applicable to all Python workers and modules in the project:
+- isolated environment and lockfile;
+- `ruff`, `pytest`, and `pip-audit`;
+- no direct DB access;
+- no secrets in notebooks/logs;
+- no automatic execution of generated scripts;
+- schema-validated input/output;
+- Python must not prevent the core from working.
 
-## 6. Regole UI
+## 6. UI rules
 
-- Nessuna query diretta a SQLite.
-- Nessuna fiducia implicita nei dati visualizzati.
-- Escaping dei contenuti e prevenzione injection.
-- Gestione stati loading/error/empty/offline.
-- Conferma per operazioni distruttive.
-- Mostrare severità separata da confidence.
-- Spiegare fonti, limiti e motivazioni.
-- Nessun segreto in local storage o log UI.
+- No direct SQLite queries.
+- No implicit trust in displayed data.
+- Content escaping and injection prevention.
+- Handling of loading/error/empty/offline states.
+- Confirmation for destructive operations.
+- Show severity separately from confidence.
+- Explain sources, limits, and rationales.
+- No secrets in local storage or UI logs.
 
-## 7. Regole database
+## 7. Database rules
 
-- Migrazioni numerate, versionate e testate.
-- FK abilitate.
-- Query parametrizzate.
-- Backup WAL-aware.
-- Nessuna cancellazione silenziosa.
-- Retention documentata e auditata.
-- Test integrità dopo restore.
-- DB file e directory con ACL minime.
+- Numbered, versioned, and tested migrations.
+- FKs enabled.
+- Parameterized queries.
+- WAL-aware backup.
+- No silent deletion.
+- Documented and audited retention.
+- Integrity tests after restore.
+- DB file and directory with minimal ACLs.
 
-## 8. Regole detection
+## 8. Detection rules
 
-- Ogni regola ha ID e versione.
-- Ogni regola ha fixture positive e negative.
-- Motivazione leggibile per ogni detection.
-- Confidence e severity distinte.
-- Feedback false positive non cancella evidenza.
-- Ogni modifica a una regola esegue regressione.
-- Nessuna risposta automatica in MVP.
-- Metriche per categoria, non solo aggregate.
+- Every rule has an ID and version.
+- Every rule has positive and negative fixtures.
+- Readable rationale for every detection.
+- Confidence and severity kept distinct.
+- False positive feedback does not delete evidence.
+- Every rule change runs a regression.
+- No automated response in the MVP.
+- Metrics per category, not only aggregate.
 
-## 9. Regole di processo
+## 9. Process rules
 
-Ogni modifica segue:
-1. requisito/bug e ID;
-2. analisi impatto e threat review;
-3. design/ADR se necessario;
-4. implementazione piccola;
-5. unit test;
-6. integration/security test applicabili;
+Every change follows:
+1. requirement/bug and ID;
+2. impact analysis and threat review;
+3. design/ADR if needed;
+4. small implementation;
+5. unit tests;
+6. applicable integration/security tests;
 7. review;
-8. aggiornamento documentazione e matrice;
-9. merge solo con CI verde;
-10. evidenza associata alla release.
+8. documentation and matrix update;
+9. merge only with green CI;
+10. evidence associated with the release.
 
-## 10. Regole Git e review
+## 10. Git and review rules
 
-- Branch e commit descrittivi.
-- PR piccole e focalizzate.
-- Nessun segreto o dato utente nel repository.
-- Nessun binario generato committato senza ragione.
-- Almeno una review per modifiche a sicurezza, storage, IPC o response.
-- Ogni eccezione alle regole deve essere motivata e registrata.
+- Descriptive branches and commits.
+- Small, focused PRs.
+- No secrets or user data in the repository.
+- No generated binaries committed without reason.
+- At least one review for changes to security, storage, IPC, or response.
+- Every exception to the rules must be justified and recorded.
 
-## 11. Regole per dipendenze
+## 11. Dependency rules
 
-- Aggiungere una dipendenza solo con motivazione.
-- Preferire librerie mantenute e con licenza compatibile.
-- Bloccare versioni tramite lockfile.
-- Eseguire scan vulnerabilità.
-- Rimuovere dipendenze non usate.
-- Non auto-aggiornare in produzione senza test.
+- Add a dependency only with justification.
+- Prefer maintained libraries with a compatible license.
+- Pin versions through lockfiles.
+- Run vulnerability scans.
+- Remove unused dependencies.
+- Do not auto-update in production without tests.
 
-## 12. Checklist PR
+## 12. PR checklist
 
-- [ ] Requisito/bug collegato.
-- [ ] Threat/permission impact valutato.
-- [ ] Nessun accesso DB fuori da Go storage.
-- [ ] Nessun segreto introdotto.
-- [ ] Error handling e logging redatto.
-- [ ] Unit test aggiunti/aggiornati.
-- [ ] Integration/security test eseguiti quando richiesto.
-- [ ] Test precedenti non regressi.
-- [ ] Documenti e matrice aggiornati.
-- [ ] CI verde.
-- [ ] Limiti e decisioni aperte registrati.
+- [ ] Requirement/bug linked.
+- [ ] Threat/permission impact assessed.
+- [ ] No DB access outside Go storage.
+- [ ] No secret introduced.
+- [ ] Error handling and redacted logging.
+- [ ] Unit tests added/updated.
+- [ ] Integration/security tests run when required.
+- [ ] No regression in previous tests.
+- [ ] Documents and matrix updated.
+- [ ] CI green.
+- [ ] Limits and open decisions recorded.
 
-## 13. Violazioni bloccanti
+## 13. Blocking violations
 
-Bloccare merge/release se la modifica:
-- espone segreti;
-- permette accesso IPC non autorizzato;
-- esegue comandi arbitrari;
-- amplia privilegi senza giustificazione;
-- abilita auto-response non approvata;
-- bypassa validazione;
-- scrive DB da UI/worker;
-- elimina dati senza audit/consenso;
-- distribuisce update non verificati.
+Block merge/release if the change:
+- exposes secrets;
+- allows unauthorized IPC access;
+- executes arbitrary commands;
+- expands privileges without justification;
+- enables unapproved auto-response;
+- bypasses validation;
+- writes to the DB from the UI/worker;
+- deletes data without audit/consent;
+- distributes unverified updates.
 
-## Aggiornamento architetturale 1.1 – decisioni consolidate (15-11-2026)
+## Architectural update 1.1 – consolidated decisions (2026-11-15)
 
-Le seguenti decisioni prevalgono su eventuali formulazioni precedenti in questo documento:
+The following decisions supersede any earlier wording in this document:
 
-- **Licenza del progetto:** MIT. Il testo completo è nel file `LICENSE` alla radice del repository. Le licenze delle dipendenze restano da verificare e rispettare separatamente.
-- **Repository:** monorepo GitHub, con codice, documentazione, test e configurazioni di build nello stesso repository.
-- **Dashboard desktop:** Tauri + React + TypeScript. Il runtime Rust interno a Tauri è distinto dai moduli Rust specialistici HSOC.
-- **Stack applicativo:** Go + Rust + Python. Go è il core e l'unica autorità di scrittura su SQLite; Rust implementa componenti specialistici di sicurezza; Python implementa worker e attività ausiliarie di analisi. Le responsabilità devono restare separate e i confini tra processi/moduli documentati.
-- **Introduzione graduale:** i tre linguaggi fanno parte dello stack approvato, ma le rispettive componenti vengono integrate per fasi verticali verificabili; non si creano cartelle o moduli vuoti e un worker non deve diventare un punto singolo di guasto del core.
-- **Docker:** facoltativo, riservato ad ambienti di sviluppo/test o servizi ausiliari isolati. Non è prerequisito di installazione o funzionamento per l'utente HSOC.
-- **Agenti remoti:** esclusi dalla V1; progettazione e implementazione funzionale dalla V2+. Nella V1 si possono definire contratti e schemi versionati per evitare una futura riprogettazione, senza aprire listener remoti.
-- **Piattaforma iniziale:** Windows x86-64; Linux e macOS restano evoluzioni successive.
-- **Tracciabilità:** requisiti, documenti, componenti, test ed evidenze devono essere collegati nella matrice del Documento 14.
+- **Project license:** MIT. The full text is in the `LICENSE` file at the repository root. Dependency licenses must still be verified and respected separately.
+- **Repository:** GitHub monorepo, with code, documentation, tests, and build configurations in the same repository.
+- **Desktop dashboard:** Tauri + React + TypeScript. The Rust runtime inside Tauri is distinct from the HSOC specialist Rust modules.
+- **Application stack:** Go + Rust + Python. Go is the core and the sole authority for writing to SQLite; Rust implements specialist security components; Python implements workers and auxiliary analysis tasks. Responsibilities must remain separate and process/module boundaries documented.
+- **Gradual introduction:** the three languages are part of the approved stack, but their components are integrated in verifiable vertical phases; no empty folders or modules are created, and a worker must not become a single point of failure for the core.
+- **Docker:** optional, reserved for development/test environments or isolated auxiliary services. It is not a prerequisite for installation or operation for the HSOC user.
+- **Remote agents:** excluded from V1; design and functional implementation from V2+. V1 may define versioned contracts and schemas to avoid a future redesign, without opening remote listeners.
+- **Initial platform:** Windows x86-64; Linux and macOS remain subsequent evolutions.
+- **Traceability:** requirements, documents, components, tests, and evidence must be linked in the Document 14 matrix.
 
-Queste decisioni aggiornano la baseline progettuale, non attestano che codice, workflow CI, installer o test siano già stati implementati o verificati.
+These decisions update the design baseline; they do not attest that code, CI workflows, installers, or tests have already been implemented or verified.
 
-### Regole repository e licenza
+### Repository and license rules
 
-- Il progetto usa la licenza MIT, conservata nel file radice `LICENSE`.
-- Ogni nuova dipendenza deve avere licenza verificata e, se necessario, attribuzione in `THIRD_PARTY_NOTICES.md`.
-- Il repository è organizzato come monorepo.
-- La dashboard usa Tauri + React + TypeScript.
-- Docker è ammesso per sviluppo/test, ma non può diventare prerequisito per l'utente finale.
-- Workflow GitHub Actions con permessi minimi; nessun segreto esposto a workflow di Pull Request non fidati.
-- `main` è protetto da Pull Request e controlli CI obbligatori, secondo le funzionalità disponibili.
-- I contratti V2 per agenti remoti possono essere documentati, ma listener e agenti remoti non sono implementati nella V1.
+- The project uses the MIT license, kept in the root file `LICENSE`.
+- Every new dependency must have a verified license and, if necessary, attribution in `THIRD_PARTY_NOTICES.md`.
+- The repository is organized as a monorepo.
+- The dashboard uses Tauri + React + TypeScript.
+- Docker is allowed for development/testing, but cannot become a prerequisite for the end user.
+- GitHub Actions workflows with minimal permissions; no secrets exposed to untrusted Pull Request workflows.
+- `main` is protected by Pull Requests and mandatory CI checks, according to the available features.
+- V2 contracts for remote agents may be documented, but listeners and remote agents are not implemented in V1.

@@ -1,3 +1,3 @@
 # cmd
 
-Entry point dei programmi Go HSOC. Creare qui i comandi quando è definita la prima vertical slice.
+Entry points for the HSOC Go programs. Create commands here once the first vertical slice is defined.

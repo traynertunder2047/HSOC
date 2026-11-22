@@ -1,3 +1,3 @@
 # internal
 
-Pacchetti Go interni: core, agente, raccolta eventi, detection, incidenti, policy, audit, backup e notifiche.
+Internal Go packages: core, agent, event collection, detection, incidents, policy, audit, backup, and notifications.

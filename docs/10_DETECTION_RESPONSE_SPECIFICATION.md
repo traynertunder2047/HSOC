@@ -1,146 +1,146 @@
 # HSOC — Detection & Response Specification
 
-**Versione:** 1.1-draft | **Modalità:** risposta ibrida conservativa
+**Version:** 1.1-draft | **Mode:** conservative hybrid response
 
 ## 1. Pipeline
 
 ```text
-Fonte OS
+OS source
   -> Collector
-  -> Validazione
-  -> Normalizzazione
-  -> Persistenza evento
-  -> Regole
+  -> Validation
+  -> Normalization
+  -> Event persistence
+  -> Rules
   -> Detection
-  -> Dedup/Correlazione
+  -> Dedup/Correlation
   -> Incident
-  -> Dashboard/Notifica
-  -> Azione proposta (simulazione/approvazione)
+  -> Dashboard/Notification
+  -> Proposed action (simulation/approval)
 ```
 
-Ogni passaggio deve avere error handling e log strutturato.
+Every step must have error handling and structured logging.
 
-## 2. Evento canonico
+## 2. Canonical event
 
-Campi logici:
+Logical fields:
 - `event_id`
 - `source`
 - `event_type`
 - `occurred_at`
 - `received_at`
-- `host_id` locale
-- `severity_hint` opzionale
-- `attributes` validati
-- `raw_reference` o payload redatto
+- local `host_id`
+- optional `severity_hint`
+- validated `attributes`
+- `raw_reference` or redacted payload
 - `schema_version`
 
-I dati grezzi sono non fidati. Limitare dimensione e campi conservati.
+Raw data is untrusted. Limit size and retained fields.
 
-## 3. Regole
+## 3. Rules
 
-Ogni regola include:
-- ID stabile;
-- versione;
-- descrizione;
-- categoria;
-- condizioni;
-- severità;
+Every rule includes:
+- stable ID;
+- version;
+- description;
+- category;
+- conditions;
+- severity;
 - confidence;
-- fonti necessarie;
-- spiegazione del match;
-- eventuali eccezioni;
-- test positivi e negativi;
-- stato enabled/disabled.
+- required sources;
+- explanation of the match;
+- any exceptions;
+- positive and negative tests;
+- enabled/disabled state.
 
-Le regole devono essere deterministiche per lo stesso input e versione. Evitare regole opache senza motivazione.
+Rules must be deterministic for the same input and version. Avoid opaque rules without justification.
 
-## 4. Severità e confidence
+## 4. Severity and confidence
 
-Severità misura l'impatto potenziale; confidence misura quanto il segnale supporta la conclusione. Non confondere i due valori. Mostrare entrambi e spiegare come sono stati assegnati.
+Severity measures potential impact; confidence measures how much the signal supports the conclusion. Do not confuse the two values. Show both and explain how they were assigned.
 
-## 5. Falsi positivi e negativi
+## 5. False positives and negatives
 
-- Ogni regola deve avere fixture positive e negative.
-- L'utente può contrassegnare un detection come falso positivo con motivazione.
-- La correzione regola richiede nuova versione e regressione.
-- Non sopprimere globalmente eventi simili senza analisi.
-- Monitorare precision/recall per categoria.
-- Non promettere zero falsi positivi.
+- Every rule must have positive and negative fixtures.
+- The user can mark a detection as a false positive with a reason.
+- A rule correction requires a new version and regression.
+- Do not globally suppress similar events without analysis.
+- Monitor precision/recall per category.
+- Do not promise zero false positives.
 
-## 6. Dedup e correlazione
+## 6. Dedup and correlation
 
-- Dedup su fingerprint e finestra documentata.
-- Conservare conteggio e prima/ultima occorrenza.
-- Correlare solo eventi con relazione esplicita e testabile.
-- Non unire incidenti solo per somiglianza vaga.
-- Conservare collegamenti evento-detection-incident.
+- Dedup on fingerprint and a documented window.
+- Keep count and first/last occurrence.
+- Correlate only events with an explicit, testable relationship.
+- Do not merge incidents based on vague similarity.
+- Keep event-detection-incident links.
 
 ## 7. Incident lifecycle
 
-Stati: `OPEN`, `ACKNOWLEDGED`, `INVESTIGATING`, `RESOLVED`, `FALSE_POSITIVE`.  
-Ogni transizione registra actor, timestamp, stato precedente, stato nuovo e motivazione.
+States: `OPEN`, `ACKNOWLEDGED`, `INVESTIGATING`, `RESOLVED`, `FALSE_POSITIVE`.  
+Every transition records actor, timestamp, previous state, new state, and reason.
 
-## 8. Risposta ibrida
+## 8. Hybrid response
 
 V1:
-- Nessuna azione automatica distruttiva.
-- Suggerimenti e simulazione.
-- Azioni sensibili richiedono conferma esplicita.
-- Azioni devono essere circoscritte, reversibili ove possibile, auditabili.
-- Non eseguire comandi arbitrari.
-- Se confidence bassa o dati insufficienti, non agire automaticamente.
+- No destructive automated action.
+- Suggestions and simulation.
+- Sensitive actions require explicit confirmation.
+- Actions must be scoped, reversible where possible, and auditable.
+- Do not execute arbitrary commands.
+- If confidence is low or data is insufficient, do not act automatically.
 
-Possibili azioni future, da valutare una per una: disabilitare temporaneamente una regola locale, mettere in quarantena un elemento solo con integrazione OS sicura, o guidare l'utente verso una procedura manuale. Nessuna è abilitata per default.
+Possible future actions, to be assessed one by one: temporarily disabling a local rule, quarantining an item only with a safe OS integration, or guiding the user through a manual procedure. None is enabled by default.
 
 ## 9. IoT
 
-La V1 può esporre inventario osservato passivamente e informazioni disponibili dal sistema/rete. Non eseguire scansioni intrusive. Segnalare esplicitamente:
-- fonte del dato;
-- ultima osservazione;
-- livello di completezza;
-- router/protocolli non supportati;
-- incertezza sull'identificazione.
+V1 may expose passively observed inventory and information available from the system/network. Do not perform intrusive scans. Explicitly report:
+- data source;
+- last observation;
+- completeness level;
+- unsupported routers/protocols;
+- uncertainty about identification.
 
-## 10. Test detection
+## 10. Detection tests
 
-| ID | Scenario | Risultato atteso |
+| ID | Scenario | Expected result |
 |---|---|---|
-| DET-01 | Fixture che soddisfa regola | Detection atteso |
-| DET-02 | Fixture benigno simile | Nessun detection non giustificato |
-| DET-03 | Evento incompleto | Gestione controllata |
-| DET-04 | Evento duplicato | Dedup secondo policy |
-| DET-05 | Eventi correlati | Un incidente con riferimenti corretti |
-| DET-06 | Eventi non correlati | Incidenti separati |
-| DET-07 | Regola disabilitata | Nessuna detection da quella regola |
-| DET-08 | Versione regola aggiornata | Versione registrata nel risultato |
-| DET-09 | Confidence bassa | Nessuna azione automatica |
-| DET-10 | False positive feedback | Audit e stato aggiornato |
-| DET-11 | Simulazione risposta | Nessun cambiamento di sistema |
-| DET-12 | Azione sensibile senza approvazione | Bloccata |
-| DET-13 | Azione approvata | Solo azione consentita e auditata |
-| DET-14 | Restart durante pipeline | Nessuna perdita/corruzione non gestita |
-| DET-15 | Dataset regressione | Metriche calcolate e confrontabili |
+| DET-01 | Fixture matching a rule | Detection expected |
+| DET-02 | Similar benign fixture | No unjustified detection |
+| DET-03 | Incomplete event | Controlled handling |
+| DET-04 | Duplicate event | Dedup according to policy |
+| DET-05 | Correlated events | One incident with correct references |
+| DET-06 | Uncorrelated events | Separate incidents |
+| DET-07 | Disabled rule | No detection from that rule |
+| DET-08 | Updated rule version | Version recorded in the result |
+| DET-09 | Low confidence | No automated action |
+| DET-10 | False positive feedback | Audit and updated status |
+| DET-11 | Response simulation | No system change |
+| DET-12 | Sensitive action without approval | Blocked |
+| DET-13 | Approved action | Only the permitted action, audited |
+| DET-14 | Restart during the pipeline | No unhandled loss/corruption |
+| DET-15 | Regression dataset | Metrics calculated and comparable |
 
-## 11. Metriche
+## 11. Metrics
 
-Precision, recall, F1, FP per 1.000 eventi, tempo ingest-to-detection, percentuale eventi non classificabili e coverage per fonte. Riportare limiti dataset e versioni.
+Precision, recall, F1, FP per 1,000 events, ingest-to-detection time, percentage of unclassifiable events, and coverage per source. Report dataset limitations and versions.
 
-## Aggiornamento architetturale 1.1 – decisioni consolidate (15-11-2026)
+## Architectural update 1.1 – consolidated decisions (2026-11-15)
 
-Le seguenti decisioni prevalgono su eventuali formulazioni precedenti in questo documento:
+The following decisions supersede any earlier wording in this document:
 
-- **Licenza del progetto:** MIT. Il testo completo è nel file `LICENSE` alla radice del repository. Le licenze delle dipendenze restano da verificare e rispettare separatamente.
-- **Repository:** monorepo GitHub, con codice, documentazione, test e configurazioni di build nello stesso repository.
-- **Dashboard desktop:** Tauri + React + TypeScript. Il runtime Rust interno a Tauri è distinto dai moduli Rust specialistici HSOC.
-- **Stack applicativo:** Go + Rust + Python. Go è il core e l'unica autorità di scrittura su SQLite; Rust implementa componenti specialistici di sicurezza; Python implementa worker e attività ausiliarie di analisi. Le responsabilità devono restare separate e i confini tra processi/moduli documentati.
-- **Introduzione graduale:** i tre linguaggi fanno parte dello stack approvato, ma le rispettive componenti vengono integrate per fasi verticali verificabili; non si creano cartelle o moduli vuoti e un worker non deve diventare un punto singolo di guasto del core.
-- **Docker:** facoltativo, riservato ad ambienti di sviluppo/test o servizi ausiliari isolati. Non è prerequisito di installazione o funzionamento per l'utente HSOC.
-- **Agenti remoti:** esclusi dalla V1; progettazione e implementazione funzionale dalla V2+. Nella V1 si possono definire contratti e schemi versionati per evitare una futura riprogettazione, senza aprire listener remoti.
-- **Piattaforma iniziale:** Windows x86-64; Linux e macOS restano evoluzioni successive.
-- **Tracciabilità:** requisiti, documenti, componenti, test ed evidenze devono essere collegati nella matrice del Documento 14.
+- **Project license:** MIT. The full text is in the `LICENSE` file at the repository root. Dependency licenses must still be verified and respected separately.
+- **Repository:** GitHub monorepo, with code, documentation, tests, and build configurations in the same repository.
+- **Desktop dashboard:** Tauri + React + TypeScript. The Rust runtime inside Tauri is distinct from the HSOC specialist Rust modules.
+- **Application stack:** Go + Rust + Python. Go is the core and the sole authority for writing to SQLite; Rust implements specialist security components; Python implements workers and auxiliary analysis tasks. Responsibilities must remain separate and process/module boundaries documented.
+- **Gradual introduction:** the three languages are part of the approved stack, but their components are integrated in verifiable vertical phases; no empty folders or modules are created, and a worker must not become a single point of failure for the core.
+- **Docker:** optional, reserved for development/test environments or isolated auxiliary services. It is not a prerequisite for installation or operation for the HSOC user.
+- **Remote agents:** excluded from V1; design and functional implementation from V2+. V1 may define versioned contracts and schemas to avoid a future redesign, without opening remote listeners.
+- **Initial platform:** Windows x86-64; Linux and macOS remain subsequent evolutions.
+- **Traceability:** requirements, documents, components, tests, and evidence must be linked in the Document 14 matrix.
 
-Queste decisioni aggiornano la baseline progettuale, non attestano che codice, workflow CI, installer o test siano già stati implementati o verificati.
+These decisions update the design baseline; they do not attest that code, CI workflows, installers, or tests have already been implemented or verified.
 
-### Responsabilità dei linguaggi nella pipeline detection
+### Language responsibilities in the detection pipeline
 
-Go mantiene pipeline, stato, regole attive, persistenza e audit. Rust può fornire funzioni specialistiche di sicurezza attraverso interfacce ristrette. Python può eseguire analisi ausiliarie e worker non autorevoli. Nessun risultato prodotto da Rust/Python viene considerato attendibile senza validazione Go. I worker non applicano direttamente azioni al sistema e non scrivono SQLite.
+Go maintains the pipeline, state, active rules, persistence, and audit. Rust may provide specialist security functions through narrow interfaces. Python may perform auxiliary analysis and non-authoritative worker tasks. No result produced by Rust/Python is considered trustworthy without Go validation. Workers do not directly apply actions to the system and do not write to SQLite.

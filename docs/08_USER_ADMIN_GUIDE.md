@@ -1,135 +1,135 @@
 # HSOC — User & Administrator Guide
 
-**Versione:** 1.1-draft | **Destinatari:** utenti locali e manutentori
+**Version:** 1.1-draft | **Audience:** local users and maintainers
 
-## 1. Introduzione
+## 1. Introduction
 
-HSOC raccoglie e organizza segnali di sicurezza disponibili sul computer. La dashboard permette di consultare eventi, rilevamenti, incidenti, inventario e stato del servizio. Il prodotto è assistivo: non garantisce che ogni minaccia venga individuata.
+HSOC collects and organizes the security signals available on the computer. The dashboard lets you review events, detections, incidents, inventory, and service status. The product is assistive: it does not guarantee that every threat is identified.
 
-## 2. Avvio e stato
+## 2. Startup and status
 
-La UI mostra:
-- servizio disponibile/non disponibile;
-- stato dei collector;
-- ultimo evento acquisito;
-- stato DB;
-- ultimo backup;
-- eventuali controlli vulnerabilità in corso;
-- versione HSOC e versione protocollo.
+The UI shows:
+- service available/unavailable;
+- collector status;
+- last event acquired;
+- DB status;
+- last backup;
+- any vulnerability checks in progress;
+- HSOC version and protocol version.
 
-Se il servizio è indisponibile, la UI deve mostrare un messaggio comprensibile e un ID diagnostico, non stack trace o segreti.
+If the service is unavailable, the UI must show an understandable message and a diagnostic ID, not stack traces or secrets.
 
 ## 3. Dashboard
 
-Sezioni consigliate:
-1. Panoramica.
-2. Eventi.
-3. Rilevamenti.
-4. Incidenti.
-5. Inventario software.
-6. Vulnerabilità.
-7. Backup e ripristino.
-8. Configurazione.
-9. Notifiche.
-10. Stato e diagnostica.
+Recommended sections:
+1. Overview.
+2. Events.
+3. Detections.
+4. Incidents.
+5. Software inventory.
+6. Vulnerabilities.
+7. Backup and restore.
+8. Configuration.
+9. Notifications.
+10. Status and diagnostics.
 
-Ogni rilevamento deve mostrare fonte, data, regola/versione, severità, confidenza, motivazione e azioni suggerite.
+Every detection must show source, date, rule/version, severity, confidence, rationale, and suggested actions.
 
-## 4. Incidenti
+## 4. Incidents
 
-Stati suggeriti:
+Suggested states:
 - `OPEN`
 - `ACKNOWLEDGED`
 - `INVESTIGATING`
 - `RESOLVED`
 - `FALSE_POSITIVE`
 
-La chiusura come falso positivo deve conservare la traccia e, se possibile, il motivo. Non cancellare silenziosamente eventi.
+Closing as a false positive must preserve the trail and, where possible, the reason. Do not silently delete events.
 
-## 5. Configurazione
+## 5. Configuration
 
-- Le impostazioni devono spiegare l'effetto di ogni opzione.
-- Opzioni rischiose off per default.
-- Le policy di sicurezza non disattivabili non devono apparire come toggle ordinari.
-- Config invalida non deve sostituire l'ultima configurazione valida.
-- Le modifiche importanti sono auditate.
+- Settings must explain the effect of each option.
+- Risky options off by default.
+- Security policies that cannot be disabled must not appear as ordinary toggles.
+- Invalid config must not replace the last valid configuration.
+- Important changes are audited.
 
-## 6. Telegram e notifiche
+## 6. Telegram and notifications
 
-Telegram è opzionale e disattivato inizialmente. L'attivazione deve:
-- essere esplicita;
-- spiegare quali dati vengono inviati e a quale servizio;
-- memorizzare token nel Credential Store del sistema operativo;
-- non inviare payload sensibili non necessari;
-- permettere test e revoca;
-- non accettare comandi remoti come risposta a notifiche.
+Telegram is optional and disabled initially. Enabling it must:
+- be explicit;
+- explain which data is sent and to which service;
+- store the token in the operating system Credential Store;
+- not send unnecessary sensitive payloads;
+- allow testing and revocation;
+- not accept remote commands in response to notifications.
 
 ## 7. IoT
 
-HSOC può mostrare soltanto informazioni ottenibili in modo passivo o tramite fonti supportate. Alcuni router non espongono dati sufficienti. Dispositivo non rilevato non significa dispositivo sicuro; dispositivo rilevato non significa dispositivo compromesso.
+HSOC can only show information obtainable passively or through supported sources. Some routers do not expose enough data. A device not detected does not mean a secure device; a device detected does not mean a compromised device.
 
-## 8. Backup e restore
+## 8. Backup and restore
 
-- Creare backup prima di aggiornamenti importanti.
-- Verificare checksum e stato backup.
-- Eseguire periodicamente un restore di prova su ambiente separato.
-- Prima del restore, mostrare quale DB verrà sostituito e quali dati potrebbero andare persi.
-- Non sovrascrivere il DB attivo senza conferma.
+- Create a backup before important updates.
+- Verify checksum and backup status.
+- Periodically perform a test restore in a separate environment.
+- Before restoring, show which DB will be replaced and which data may be lost.
+- Do not overwrite the active DB without confirmation.
 
-## 9. Diagnostica
+## 9. Diagnostics
 
-Export diagnostico:
-- deve essere volontario;
-- deve mostrare anteprima dei contenuti;
-- deve redigere token, credenziali e dati non necessari;
-- deve includere versioni, health, errori e informazioni tecniche minime;
-- non deve inviare automaticamente il file a terzi.
+Diagnostic export:
+- must be voluntary;
+- must show a preview of the contents;
+- must redact tokens, credentials, and unnecessary data;
+- must include versions, health, errors, and minimal technical information;
+- must not automatically send the file to third parties.
 
-## 10. Risoluzione problemi
+## 10. Troubleshooting
 
-| Sintomo | Controllo |
+| Symptom | Check |
 |---|---|
-| UI non si connette | Verificare servizio e ACL IPC |
-| Servizio non parte | Consultare log redatto e health |
-| Nessun evento | Verificare stato collector e limiti OS |
-| Troppi alert | Esaminare regola, versione, confidence e fixture |
-| Backup fallito | Spazio, permessi, WAL e checksum |
-| Restore non disponibile | Verificare versione DB e integrità backup |
-| Telegram non invia | Stato opt-in, token e connettività |
+| UI cannot connect | Verify service and IPC ACL |
+| Service does not start | Consult redacted logs and health |
+| No events | Verify collector status and OS limits |
+| Too many alerts | Review rule, version, confidence, and fixtures |
+| Backup failed | Space, permissions, WAL, and checksum |
+| Restore unavailable | Verify DB version and backup integrity |
+| Telegram does not send | Opt-in status, token, and connectivity |
 
 ## 11. Privacy
 
-I dati sono locali per default. Prima di abilitare integrazioni esterne, spiegare i dati condivisi. L'utente deve poter disattivare Telegram e rimuovere le credenziali. Retention ed export devono essere trasparenti.
+Data is local by default. Before enabling external integrations, explain the shared data. The user must be able to disable Telegram and remove credentials. Retention and export must be transparent.
 
-## 12. Test usabilità e guide
+## 12. Usability tests and guides
 
-- UI-01: panoramica mostra health corretto.
-- UI-02: evento e incidente sono distinguibili.
-- UI-03: severity e confidence hanno definizioni accessibili.
-- UI-04: errore IPC non causa schermata bloccata.
-- UI-05: impostazioni opzionali off al primo avvio.
-- UI-06: restore mostra conferma e conseguenze.
-- UI-07: export mostra anteprima/redazione.
-- UI-08: limiti IoT sono espliciti.
-- UI-09: guida installazione coincide con installer reale.
-- UI-10: documentazione aggiornata per release.
+- UI-01: overview shows correct health.
+- UI-02: event and incident are distinguishable.
+- UI-03: severity and confidence have accessible definitions.
+- UI-04: an IPC error does not cause a frozen screen.
+- UI-05: optional settings off on first start.
+- UI-06: restore shows confirmation and consequences.
+- UI-07: export shows preview/redaction.
+- UI-08: IoT limits are explicit.
+- UI-09: the installation guide matches the actual installer.
+- UI-10: documentation updated per release.
 
-## Aggiornamento architetturale 1.1 – decisioni consolidate (15-11-2026)
+## Architectural update 1.1 – consolidated decisions (2026-11-15)
 
-Le seguenti decisioni prevalgono su eventuali formulazioni precedenti in questo documento:
+The following decisions supersede any earlier wording in this document:
 
-- **Licenza del progetto:** MIT. Il testo completo è nel file `LICENSE` alla radice del repository. Le licenze delle dipendenze restano da verificare e rispettare separatamente.
-- **Repository:** monorepo GitHub, con codice, documentazione, test e configurazioni di build nello stesso repository.
-- **Dashboard desktop:** Tauri + React + TypeScript. Il runtime Rust interno a Tauri è distinto dai moduli Rust specialistici HSOC.
-- **Stack applicativo:** Go + Rust + Python. Go è il core e l'unica autorità di scrittura su SQLite; Rust implementa componenti specialistici di sicurezza; Python implementa worker e attività ausiliarie di analisi. Le responsabilità devono restare separate e i confini tra processi/moduli documentati.
-- **Introduzione graduale:** i tre linguaggi fanno parte dello stack approvato, ma le rispettive componenti vengono integrate per fasi verticali verificabili; non si creano cartelle o moduli vuoti e un worker non deve diventare un punto singolo di guasto del core.
-- **Docker:** facoltativo, riservato ad ambienti di sviluppo/test o servizi ausiliari isolati. Non è prerequisito di installazione o funzionamento per l'utente HSOC.
-- **Agenti remoti:** esclusi dalla V1; progettazione e implementazione funzionale dalla V2+. Nella V1 si possono definire contratti e schemi versionati per evitare una futura riprogettazione, senza aprire listener remoti.
-- **Piattaforma iniziale:** Windows x86-64; Linux e macOS restano evoluzioni successive.
-- **Tracciabilità:** requisiti, documenti, componenti, test ed evidenze devono essere collegati nella matrice del Documento 14.
+- **Project license:** MIT. The full text is in the `LICENSE` file at the repository root. Dependency licenses must still be verified and respected separately.
+- **Repository:** GitHub monorepo, with code, documentation, tests, and build configurations in the same repository.
+- **Desktop dashboard:** Tauri + React + TypeScript. The Rust runtime inside Tauri is distinct from the HSOC specialist Rust modules.
+- **Application stack:** Go + Rust + Python. Go is the core and the sole authority for writing to SQLite; Rust implements specialist security components; Python implements workers and auxiliary analysis tasks. Responsibilities must remain separate and process/module boundaries documented.
+- **Gradual introduction:** the three languages are part of the approved stack, but their components are integrated in verifiable vertical phases; no empty folders or modules are created, and a worker must not become a single point of failure for the core.
+- **Docker:** optional, reserved for development/test environments or isolated auxiliary services. It is not a prerequisite for installation or operation for the HSOC user.
+- **Remote agents:** excluded from V1; design and functional implementation from V2+. V1 may define versioned contracts and schemas to avoid a future redesign, without opening remote listeners.
+- **Initial platform:** Windows x86-64; Linux and macOS remain subsequent evolutions.
+- **Traceability:** requirements, documents, components, tests, and evidence must be linked in the Document 14 matrix.
 
-Queste decisioni aggiornano la baseline progettuale, non attestano che codice, workflow CI, installer o test siano già stati implementati o verificati.
+These decisions update the design baseline; they do not attest that code, CI workflows, installers, or tests have already been implemented or verified.
 
-### Nota per l'utente finale
+### Note for the end user
 
-L'utente non deve installare Docker né toolchain di sviluppo (Go, Rust, Python, Node.js). L'installer HSOC distribuirà i componenti necessari. La dashboard è un'applicazione desktop Tauri con interfaccia React/TypeScript; il servizio Go può continuare a funzionare anche quando la dashboard è chiusa. I moduli interni Rust/Python non richiedono configurazioni separate da parte dell'utente.
+The user must not install Docker or development toolchains (Go, Rust, Python, Node.js). The HSOC installer will distribute the necessary components. The dashboard is a Tauri desktop application with a React/TypeScript interface; the Go service can keep running even when the dashboard is closed. The internal Rust/Python modules require no separate configuration by the user.

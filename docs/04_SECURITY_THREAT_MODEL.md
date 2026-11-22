@@ -1,131 +1,131 @@
 # HSOC — Security Threat Model
 
-**Versione:** 1.1-draft | **Metodo:** asset → minaccia → controllo → test
+**Version:** 1.1-draft | **Method:** asset → threat → control → test
 
-## 1. Scopo e confini
+## 1. Purpose and boundaries
 
-Modellare le minacce al servizio locale, alla UI, al database, alle configurazioni, ai backup, alle notifiche e alle fonti di eventi. Il modello va aggiornato quando cambiano architettura, permessi, IPC o funzionalità.
+Model the threats to the local service, the UI, the database, configurations, backups, notifications, and event sources. The model must be updated when architecture, permissions, IPC, or functionality change.
 
-## 2. Asset
+## 2. Assets
 
-- Integrità e disponibilità del DB.
-- Configurazioni e policy.
-- Credenziali Telegram e altri token opzionali.
-- Log, eventi, incidenti e inventario.
-- Integrità degli aggiornamenti e dei binari.
-- Canale IPC.
-- Backup e chiavi di cifratura.
-- Identità del servizio e autorizzazioni.
+- DB integrity and availability.
+- Configurations and policies.
+- Telegram credentials and other optional tokens.
+- Logs, events, incidents, and inventory.
+- Integrity of updates and binaries.
+- IPC channel.
+- Backups and encryption keys.
+- Service identity and authorizations.
 
-## 3. Attori e superfici
+## 3. Actors and surfaces
 
-- Utente locale autorizzato.
-- Processo locale non autorizzato o compromesso.
-- Input/eventi OS malformati.
-- Dipendenze vulnerabili.
-- Pacchetto di aggiornamento manomesso.
-- Dispositivo IoT non affidabile.
-- Canale di notifica esterno.
+- Authorized local user.
+- Unauthorized or compromised local process.
+- Malformed OS input/events.
+- Vulnerable dependencies.
+- Tampered update package.
+- Untrusted IoT device.
+- External notification channel.
 
-Superfici: installer, servizio, IPC, parser eventi, configurazione, DB, backup, updater, UI, integrazioni.
+Surfaces: installer, service, IPC, event parsers, configuration, DB, backup, updater, UI, integrations.
 
-## 4. Minacce e mitigazioni
+## 4. Threats and mitigations
 
-| ID | Minaccia | Mitigazione primaria |
+| ID | Threat | Primary mitigation |
 |---|---|---|
-| TH-01 | Processo locale non autorizzato usa IPC | ACL, verifica identità, autorizzazione per operazione |
-| TH-02 | UI invia input malformato | Schema validation, limiti, fuzz/unit test |
-| TH-03 | Evento costruito male causa crash | Parser robusto, limiti, isolamento errori |
-| TH-04 | Privilegi eccessivi del servizio | Least privilege, capability esplicite |
-| TH-05 | DB corrotto o modificato | ACL file, integrità, backup verificati |
-| TH-06 | Segreti nei log/config/backup | OS Credential Store, redazione, cifratura |
-| TH-07 | Update manomesso | Firma e verifica pacchetti |
-| TH-08 | Dipendenza vulnerabile | Inventario, advisory scan, aggiornamento controllato |
-| TH-09 | Falso positivo induce risposta errata | Confidence, motivazione, approvazione umana |
-| TH-10 | Notifica falsificata usata come comando | Notifiche solo informative, nessun comando remoto |
-| TH-11 | IoT non osservabile | Dichiarare limiti, non inferire sicurezza dall'assenza dati |
-| TH-12 | Backup non ripristinabile | Checksum, test restore periodici |
-| TH-13 | Export diagnostico divulga dati | Redazione, preview, minimizzazione |
-| TH-14 | Modulo opzionale compromesso | Isolamento, interfaccia stretta, niente accesso DB |
-| TH-15 | Config alterata indebolisce policy | Validazione, audit, vincoli di sicurezza non disattivabili |
+| TH-01 | Unauthorized local process uses IPC | ACL, identity verification, per-operation authorization |
+| TH-02 | UI sends malformed input | Schema validation, limits, fuzz/unit tests |
+| TH-03 | Crafted event causes a crash | Robust parser, limits, error isolation |
+| TH-04 | Excessive service privileges | Least privilege, explicit capabilities |
+| TH-05 | Corrupted or modified DB | File ACL, integrity, verified backups |
+| TH-06 | Secrets in logs/config/backups | OS Credential Store, redaction, encryption |
+| TH-07 | Tampered update | Package signing and verification |
+| TH-08 | Vulnerable dependency | Inventory, advisory scan, controlled update |
+| TH-09 | False positive triggers a wrong response | Confidence, rationale, human approval |
+| TH-10 | Forged notification used as a command | Notifications informational only, no remote commands |
+| TH-11 | Unobservable IoT | Declare limits, do not infer security from missing data |
+| TH-12 | Unrestorable backup | Checksums, periodic restore tests |
+| TH-13 | Diagnostic export leaks data | Redaction, preview, minimization |
+| TH-14 | Compromised optional module | Isolation, narrow interface, no DB access |
+| TH-15 | Altered config weakens policy | Validation, audit, security constraints that cannot be disabled |
 
-## 5. Principi di controllo
+## 5. Control principles
 
-- Secure defaults e fail-safe.
-- Minimo privilegio e separazione UI/servizio.
-- Nessun comando arbitrario.
-- Input non fidati validati.
-- Segreti conservati nel sistema operativo.
-- Aggiornamenti verificati.
-- Audit per operazioni sensibili.
-- Risposte automatiche disabilitate inizialmente.
-- Backup testati.
-- Nessuna porta remota aperta per default.
+- Secure defaults and fail-safe.
+- Least privilege and UI/service separation.
+- No arbitrary commands.
+- Untrusted input validated.
+- Secrets kept in the operating system.
+- Verified updates.
+- Audit for sensitive operations.
+- Automated responses disabled initially.
+- Tested backups.
+- No remote port open by default.
 
-## 6. Gestione degli incidenti di sicurezza del software
+## 6. Software security incident handling
 
-1. Rilevare e classificare il problema.
-2. Conservare log e versione interessata, senza raccogliere dati non necessari.
-3. Limitare la funzione vulnerabile con una policy sicura.
-4. Preparare patch e test.
-5. Revisione indipendente.
-6. Pubblicare advisory e aggiornamento firmato quando necessario.
-7. Verificare la correzione e aggiornare il threat model.
+1. Detect and classify the problem.
+2. Preserve logs and the affected version, without collecting unnecessary data.
+3. Limit the vulnerable function with a safe policy.
+4. Prepare patch and tests.
+5. Independent review.
+6. Publish an advisory and signed update when necessary.
+7. Verify the fix and update the threat model.
 
-## 7. Test di sicurezza
+## 7. Security tests
 
-| ID | Test | Risultato atteso |
+| ID | Test | Expected result |
 |---|---|---|
-| SEC-01 | Client IPC senza permesso | Accesso negato |
-| SEC-02 | Input con campi inattesi | Rifiuto o ignoranza controllata secondo schema |
-| SEC-03 | Payload enorme | Rifiuto entro limiti |
-| SEC-04 | Tentativo di shell injection nei campi | Nessun comando eseguito |
-| SEC-05 | Ricerca token nei log | Nessun segreto trovato |
-| SEC-06 | Verifica permessi directory dati | Solo identità autorizzate |
-| SEC-07 | Config che disabilita controllo di sicurezza obbligatorio | Rifiutata |
-| SEC-08 | Pacchetto update non firmato/alterato | Installazione bloccata |
-| SEC-09 | Export diagnostico | Segreti e dati non necessari redatti |
-| SEC-10 | Worker opzionale non disponibile | Core resta stabile e segnala degrado |
-| SEC-11 | Errore DB durante operazione | Nessuna scrittura parziale non consistente |
-| SEC-12 | Restore non autorizzato | Negato e auditato |
-| SEC-13 | Notifica con contenuto ostile | Visualizzata come testo, mai eseguita |
-| SEC-14 | Servizio avviato senza privilegi elevati non necessari | Funzioni base operative |
-| SEC-15 | Dipendenze note vulnerabili in CI | Pipeline segnala/blocca secondo severità |
-| SEC-16 | Test di regressione su permessi | Nessun ampliamento non documentato |
+| SEC-01 | IPC client without permission | Access denied |
+| SEC-02 | Input with unexpected fields | Rejection or controlled ignoring according to schema |
+| SEC-03 | Huge payload | Rejection within limits |
+| SEC-04 | Shell injection attempt in fields | No command executed |
+| SEC-05 | Search for tokens in logs | No secrets found |
+| SEC-06 | Check data directory permissions | Authorized identities only |
+| SEC-07 | Config that disables a mandatory security control | Rejected |
+| SEC-08 | Unsigned/tampered update package | Installation blocked |
+| SEC-09 | Diagnostic export | Secrets and unnecessary data redacted |
+| SEC-10 | Optional worker unavailable | Core remains stable and reports degradation |
+| SEC-11 | DB error during an operation | No inconsistent partial write |
+| SEC-12 | Unauthorized restore | Denied and audited |
+| SEC-13 | Notification with hostile content | Displayed as text, never executed |
+| SEC-14 | Service started without unnecessary elevated privileges | Core functions operational |
+| SEC-15 | Known vulnerable dependencies in CI | Pipeline flags/blocks according to severity |
+| SEC-16 | Permission regression test | No undocumented expansion |
 
-## 8. Rischi residui
+## 8. Residual risks
 
-- Un endpoint già compromesso può falsificare o sopprimere eventi.
-- Router consumer possono non esporre telemetria sufficiente.
-- Un utente con privilegi amministrativi può alterare il sistema locale.
-- Nessun prodotto può garantire detection completa.
-- Il modello non sostituisce un audit professionale prima di una distribuzione pubblica.
+- An already compromised endpoint can forge or suppress events.
+- Consumer routers may not expose sufficient telemetry.
+- A user with administrative privileges can alter the local system.
+- No product can guarantee complete detection.
+- The model does not replace a professional audit before public distribution.
 
 ## 9. Gate
 
-Prima di ogni release: threat model aggiornato, test SEC eseguiti, vulnerabilità note valutate, firma verificata, backup/restore testato, nessun rischio critico aperto senza accettazione formale.
+Before every release: updated threat model, SEC tests executed, known vulnerabilities assessed, signature verified, backup/restore tested, and no open critical risk without formal acceptance.
 
-## Aggiornamento architetturale 1.1 – decisioni consolidate (15-11-2026)
+## Architectural update 1.1 – consolidated decisions (2026-11-15)
 
-Le seguenti decisioni prevalgono su eventuali formulazioni precedenti in questo documento:
+The following decisions supersede any earlier wording in this document:
 
-- **Licenza del progetto:** MIT. Il testo completo è nel file `LICENSE` alla radice del repository. Le licenze delle dipendenze restano da verificare e rispettare separatamente.
-- **Repository:** monorepo GitHub, con codice, documentazione, test e configurazioni di build nello stesso repository.
-- **Dashboard desktop:** Tauri + React + TypeScript. Il runtime Rust interno a Tauri è distinto dai moduli Rust specialistici HSOC.
-- **Stack applicativo:** Go + Rust + Python. Go è il core e l'unica autorità di scrittura su SQLite; Rust implementa componenti specialistici di sicurezza; Python implementa worker e attività ausiliarie di analisi. Le responsabilità devono restare separate e i confini tra processi/moduli documentati.
-- **Introduzione graduale:** i tre linguaggi fanno parte dello stack approvato, ma le rispettive componenti vengono integrate per fasi verticali verificabili; non si creano cartelle o moduli vuoti e un worker non deve diventare un punto singolo di guasto del core.
-- **Docker:** facoltativo, riservato ad ambienti di sviluppo/test o servizi ausiliari isolati. Non è prerequisito di installazione o funzionamento per l'utente HSOC.
-- **Agenti remoti:** esclusi dalla V1; progettazione e implementazione funzionale dalla V2+. Nella V1 si possono definire contratti e schemi versionati per evitare una futura riprogettazione, senza aprire listener remoti.
-- **Piattaforma iniziale:** Windows x86-64; Linux e macOS restano evoluzioni successive.
-- **Tracciabilità:** requisiti, documenti, componenti, test ed evidenze devono essere collegati nella matrice del Documento 14.
+- **Project license:** MIT. The full text is in the `LICENSE` file at the repository root. Dependency licenses must still be verified and respected separately.
+- **Repository:** GitHub monorepo, with code, documentation, tests, and build configurations in the same repository.
+- **Desktop dashboard:** Tauri + React + TypeScript. The Rust runtime inside Tauri is distinct from the HSOC specialist Rust modules.
+- **Application stack:** Go + Rust + Python. Go is the core and the sole authority for writing to SQLite; Rust implements specialist security components; Python implements workers and auxiliary analysis tasks. Responsibilities must remain separate and process/module boundaries documented.
+- **Gradual introduction:** the three languages are part of the approved stack, but their components are integrated in verifiable vertical phases; no empty folders or modules are created, and a worker must not become a single point of failure for the core.
+- **Docker:** optional, reserved for development/test environments or isolated auxiliary services. It is not a prerequisite for installation or operation for the HSOC user.
+- **Remote agents:** excluded from V1; design and functional implementation from V2+. V1 may define versioned contracts and schemas to avoid a future redesign, without opening remote listeners.
+- **Initial platform:** Windows x86-64; Linux and macOS remain subsequent evolutions.
+- **Traceability:** requirements, documents, components, tests, and evidence must be linked in the Document 14 matrix.
 
-Queste decisioni aggiornano la baseline progettuale, non attestano che codice, workflow CI, installer o test siano già stati implementati o verificati.
+These decisions update the design baseline; they do not attest that code, CI workflows, installers, or tests have already been implemented or verified.
 
-### Rischi aggiuntivi introdotti dallo stack multi-linguaggio
+### Additional risks introduced by the multi-language stack
 
-- **Confini Go/Rust/Python:** validare schema, dimensioni, encoding e versioni a ogni confine; gestire timeout, crash e risultati incompleti.
-- **FFI Rust:** mantenere interfacce piccole, documentare ownership e lifetime, gestire panic boundary e non trasferire privilegi impliciti.
-- **Worker Python:** esecuzione isolata e limitata; nessuna esecuzione di codice generato o comandi arbitrari; dipendenze bloccate e verificate.
-- **Dashboard Tauri:** esporre solo capability necessarie, ridurre i comandi Tauri disponibili alla UI e non considerare il frontend un confine di autorizzazione.
-- **Docker:** non necessario nel prodotto; i container di test non devono ricevere segreti o montaggi host non indispensabili.
-- **V2 agenti remoti:** richiederanno threat model dedicato per identità, enrollment, revoca, autenticazione reciproca, replay protection e aggiornamenti.
+- **Go/Rust/Python boundaries:** validate schema, sizes, encoding, and versions at every boundary; handle timeouts, crashes, and incomplete results.
+- **Rust FFI:** keep interfaces small, document ownership and lifetimes, handle panic boundaries, and do not transfer implicit privileges.
+- **Python workers:** isolated and restricted execution; no execution of generated code or arbitrary commands; pinned and verified dependencies.
+- **Tauri dashboard:** expose only the necessary capabilities, reduce the Tauri commands available to the UI, and do not treat the frontend as an authorization boundary.
+- **Docker:** not required in the product; test containers must not receive secrets or non-essential host mounts.
+- **V2 remote agents:** will require a dedicated threat model for identity, enrollment, revocation, mutual authentication, replay protection, and updates.

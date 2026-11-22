@@ -1,20 +1,20 @@
 # Security Policy
 
-## Segnalazione
+## Reporting
 
-Non pubblicare dettagli di una vulnerabilità non corretta in issue pubbliche. Preparare una segnalazione privata con:
-- versione/commit interessato;
-- componente e piattaforma;
-- impatto osservato;
-- passaggi riproducibili non distruttivi;
-- eventuale mitigazione.
+Do not publish details of an unfixed vulnerability in public issues. Prepare a private report with:
+- affected version/commit;
+- component and platform;
+- observed impact;
+- non-destructive reproducible steps;
+- any mitigation.
 
-Canale di contatto per la disclosure: **da configurare prima della pubblicazione del repository**.
+Disclosure contact channel: **to be configured before the repository is published**.
 
-## Ambito
+## Scope
 
-La policy riguarda codice HSOC, dipendenze, installer, aggiornamenti, IPC e trattamento dei dati. Non inviare credenziali, dati personali o informazioni di rete non necessarie.
+The policy covers HSOC code, dependencies, installers, updates, IPC, and data handling. Do not send credentials, personal data, or unnecessary network information.
 
-## Stato
+## Status
 
-Documento iniziale. Il canale privato di segnalazione deve essere configurato prima di dichiarare il progetto pronto a ricevere disclosure pubbliche.
+Initial document. The private reporting channel must be configured before declaring the project ready to receive public disclosures.

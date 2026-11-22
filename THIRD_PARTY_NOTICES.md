@@ -1,9 +1,9 @@
 # Third-party notices
 
-Nessuna dipendenza software di HSOC è ancora inventariata in questo documento.
+No HSOC software dependency is inventoried in this document yet.
 
-Prima di ogni release:
-1. generare la SBOM dei componenti effettivamente distribuiti;
-2. verificare licenze e obblighi di attribuzione;
-3. riportare qui gli avvisi richiesti dalle dipendenze;
-4. mantenere separata la licenza MIT di HSOC dalle licenze di terze parti.
+Before every release:
+1. generate the SBOM of the components actually distributed;
+2. verify licenses and attribution obligations;
+3. list here the notices required by the dependencies;
+4. keep the HSOC MIT license separate from third-party licenses.

@@ -1,41 +1,41 @@
-# Documento 16 – GitHub, CI/CD e DevSecOps
+# Document 16 – GitHub, CI/CD, and DevSecOps
 
-**Progetto:** HSOC – Home Security Operations Center  
-**Versione documento:** 1.1 – bozza progettuale aggiornata  
-**Stato:** Specifica proposta, da approvare e implementare  
-**Data:** 15 novembre 2026
+**Project:** HSOC – Home Security Operations Center  
+**Document version:** 1.1 – updated design draft  
+**Status:** Proposed specification, to be approved and implemented  
+**Date:** November 15, 2026
 
 ---
 
-## 1. Scopo
+## 1. Purpose
 
-Questo documento definisce come organizzare il repository GitHub di HSOC e come automatizzare controlli di qualità, test, sicurezza e preparazione delle release.
+This document defines how to organize the HSOC GitHub repository and how to automate quality checks, tests, security, and release preparation.
 
-Gli obiettivi sono:
+The objectives are:
 
-- individuare errori prima che le modifiche entrino nel ramo principale;
-- verificare automaticamente compilazione e test;
-- controllare le dipendenze e individuare vulnerabilità note;
-- ridurre il rischio di pubblicare segreti o dati personali;
-- rendere riproducibili build e verifiche;
-- mantenere separati sviluppo, test e distribuzione.
+- identify errors before changes reach the main branch;
+- automatically verify compilation and tests;
+- check dependencies and identify known vulnerabilities;
+- reduce the risk of publishing secrets or personal data;
+- make builds and verifications reproducible;
+- keep development, testing, and distribution separate.
 
-La CI non certifica che il prodotto sia sicuro: verifica soltanto i controlli automatizzati configurati.
+CI does not certify that the product is secure: it only verifies the automated checks that have been configured.
 
-## 2. Principi e vincoli
+## 2. Principles and constraints
 
-1. **Local-first:** Docker e servizi cloud non devono essere necessari per eseguire HSOC sul computer dell'utente.
-2. **Costo iniziale zero:** usare le funzionalità gratuite disponibili, rispettandone limiti e condizioni. Non dipendere da servizi a pagamento.
-3. **Windows first:** la prima pipeline completa deve verificare Windows. Linux e macOS saranno aggiunti quando il supporto sarà implementato.
-4. **Least privilege:** workflow e token devono avere solo i permessi strettamente necessari.
-5. **Fail closed per i controlli essenziali:** una verifica obbligatoria fallita blocca il merge.
-6. **Riproducibilità:** versioni degli strumenti e dipendenze devono essere dichiarate e mantenute sotto controllo.
-7. **Nessuna azione automatica sul sistema dell'utente:** la CI testa il software; non esegue risposte alle minacce sui dispositivi degli utenti.
-8. **Nessun segreto nel repository:** token Telegram, chiavi, credenziali e dati locali non devono essere committati.
+1. **Local-first:** Docker and cloud services must not be required to run HSOC on the user's computer.
+2. **Zero initial cost:** use the available free features, respecting their limits and conditions. Do not depend on paid services.
+3. **Windows first:** the first complete pipeline must verify Windows. Linux and macOS will be added when support is implemented.
+4. **Least privilege:** workflows and tokens must have only the strictly necessary permissions.
+5. **Fail closed for essential checks:** a failed mandatory check blocks the merge.
+6. **Reproducibility:** tool versions and dependencies must be declared and kept under control.
+7. **No automated action on the user's system:** CI tests the software; it does not execute threat responses on user devices.
+8. **No secrets in the repository:** Telegram tokens, keys, credentials, and local data must not be committed.
 
-## 3. Repository e struttura
+## 3. Repository and structure
 
-Struttura iniziale consigliata:
+Recommended initial structure:
 
 ```text
 HSOC/
@@ -49,21 +49,21 @@ HSOC/
 │   │   └── release.yml
 │   ├── ISSUE_TEMPLATE/
 │   └── pull_request_template.md
-├── cmd/                     # entry point Go
-├── internal/                # core e moduli Go
-├── rust/                    # moduli specialistici di sicurezza
-├── python/                  # worker e analisi ausiliarie
+├── cmd/                     # Go entry points
+├── internal/                # Go core and modules
+├── rust/                    # specialist security modules
+├── python/                  # workers and auxiliary analysis
 ├── desktop/
 │   ├── src/                 # React + TypeScript
-│   └── src-tauri/           # shell Tauri
+│   └── src-tauri/           # Tauri shell
 ├── database/                # schema, migrations, queries
-├── protocols/               # IPC, eventi, messaggi e schemi
+├── protocols/               # IPC, events, messages, and schemas
 ├── rules/
 ├── configs/
 ├── installers/windows/
 ├── docs/
 ├── tests/
-├── docker/                  # facoltativo: sviluppo/test
+├── docker/                  # optional: development/testing
 ├── scripts/
 ├── .gitignore
 ├── README.md
@@ -73,47 +73,47 @@ HSOC/
 └── CHANGELOG.md
 ```
 
-Go, Rust e Python fanno parte dello stack approvato; i rispettivi moduli vengono integrati per fasi. Non è necessario creare directory o moduli vuoti prima di avviare la relativa implementazione. La struttura effettiva dovrà restare allineata all'architettura approvata nei documenti precedenti.
+Go, Rust, and Python are part of the approved stack; their modules are integrated in phases. There is no need to create empty directories or modules before starting the related implementation. The actual structure must stay aligned with the architecture approved in the previous documents.
 
-### 3.1 Branch
+### 3.1 Branches
 
-- `main`: ramo stabile; modifiche solo tramite Pull Request.
-- `feature/<descrizione>`: nuove funzionalità.
-- `fix/<descrizione>`: correzioni.
-- `docs/<descrizione>`: documentazione.
-- `security/<descrizione>`: correzioni di sicurezza, con accesso e revisione appropriati.
+- `main`: stable branch; changes only through Pull Requests.
+- `feature/<description>`: new functionality.
+- `fix/<description>`: fixes.
+- `docs/<description>`: documentation.
+- `security/<description>`: security fixes, with appropriate access and review.
 
-Per un progetto individuale, la revisione può essere una checklist personale documentata; non si deve fingere una revisione indipendente se non è avvenuta.
+For an individual project, review can be a documented personal checklist; an independent review must not be faked if it did not happen.
 
-### 3.2 Protezione di `main`
+### 3.2 Protection of `main`
 
-Configurare, dove disponibile:
+Configure, where available:
 
-- obbligo di Pull Request;
-- controlli CI obbligatori;
-- blocco dei force-push;
-- blocco della cancellazione del branch;
-- risoluzione delle conversazioni prima del merge;
-- almeno una revisione indipendente quando il progetto avrà più collaboratori.
+- mandatory Pull Request;
+- mandatory CI checks;
+- blocking of force-pushes;
+- blocking of branch deletion;
+- resolution of conversations before merge;
+- at least one independent review once the project has more collaborators.
 
-Non abilitare regole che richiedono un numero di approvazioni impossibile da soddisfare per un repository gestito da una sola persona.
+Do not enable rules that require a number of approvals impossible to satisfy for a repository managed by a single person.
 
-## 4. Strategia CI
+## 4. CI strategy
 
-La CI (Continuous Integration) viene eseguita sulle Pull Request e sugli aggiornamenti dei branch rilevanti. È prevista anche un'esecuzione pianificata per controlli periodici.
+CI (Continuous Integration) runs on Pull Requests and on updates to the relevant branches. A scheduled run is also planned for periodic checks.
 
-### 4.1 Pipeline Go – agente principale
+### 4.1 Go pipeline – main agent
 
-Controlli previsti:
+Planned checks:
 
-- formattazione con `gofmt`;
-- analisi con `go vet`;
-- test con `go test ./...`;
-- compilazione per il target Windows supportato;
-- controllo delle vulnerabilità dei moduli Go con `govulncheck`;
-- verifica che `go.mod` e `go.sum` siano coerenti.
+- formatting with `gofmt`;
+- analysis with `go vet`;
+- tests with `go test ./...`;
+- compilation for the supported Windows target;
+- Go module vulnerability check with `govulncheck`;
+- verification that `go.mod` and `go.sum` are consistent.
 
-Comandi indicativi:
+Indicative commands:
 
 ```bash
 gofmt -w .
@@ -123,240 +123,240 @@ govulncheck ./...
 go build ./...
 ```
 
-In CI, il controllo di formattazione deve verificare il repository senza modificare i file e fallire se trova file non formattati. Il comando `gofmt -w` è utile localmente, non come correzione silenziosa del commit nel workflow.
+In CI, the formatting check must verify the repository without modifying files and fail if it finds unformatted files. The `gofmt -w` command is useful locally, not as a silent commit fix in the workflow.
 
-### 4.2 Pipeline Rust – moduli specialistici
+### 4.2 Rust pipeline – specialist modules
 
-Da attivare quando il codice Rust sarà introdotto:
+To be enabled when Rust code is introduced:
 
 - `cargo fmt --check`;
 - `cargo clippy -- -D warnings`;
 - `cargo test`;
-- controllo delle dipendenze con `cargo audit`;
-- build per i target effettivamente supportati.
+- dependency check with `cargo audit`;
+- build for the targets actually supported.
 
-### 4.3 Pipeline Python – moduli ausiliari
+### 4.3 Python pipeline – auxiliary modules
 
-Da attivare quando Python sarà introdotto:
+To be enabled when Python is introduced:
 
-- lint e formattazione con uno strumento scelto e versionato, ad esempio Ruff;
-- test con `pytest`;
-- controllo delle dipendenze con `pip-audit`;
-- build o packaging solo se previsto dal componente.
+- lint and formatting with a chosen and versioned tool, for example Ruff;
+- tests with `pytest`;
+- dependency check with `pip-audit`;
+- build or packaging only if required by the component.
 
-Le dipendenze devono essere fissate o bloccate con un lockfile, secondo il sistema di packaging adottato.
+Dependencies must be pinned or locked with a lockfile, according to the packaging system adopted.
 
-### 4.4 Dashboard – React e TypeScript
+### 4.4 Dashboard – React and TypeScript
 
-Da attivare quando la dashboard sarà introdotta:
+To be enabled when the dashboard is introduced:
 
-- installazione riproducibile delle dipendenze tramite lockfile;
+- reproducible dependency installation through a lockfile;
 - lint;
-- controllo dei tipi TypeScript;
-- test automatici;
-- build di produzione.
+- TypeScript type check;
+- automated tests;
+- production build.
 
-Usare `npm ci` se il progetto adotta npm e mantiene `package-lock.json`; per altri package manager usare il relativo comando deterministico.
+Use `npm ci` if the project adopts npm and maintains `package-lock.json`; for other package managers, use the corresponding deterministic command.
 
-### 4.5 Test d'integrazione
+### 4.5 Integration tests
 
-I test d'integrazione verificano i confini tra componenti, in particolare:
+Integration tests verify the boundaries between components, in particular:
 
-1. acquisizione e validazione di un evento di test;
-2. normalizzazione da parte dell'agente Go;
-3. persistenza nel database SQLite;
-4. generazione di un evento o incidente dimostrativo;
-5. visualizzazione nella dashboard, quando disponibile;
-6. comportamento in caso di database non disponibile o dati non validi.
+1. acquisition and validation of a test event;
+2. normalization by the Go agent;
+3. persistence in the SQLite database;
+4. generation of a demonstrative event or incident;
+5. display in the dashboard, when available;
+6. behavior when the database is unavailable or data is invalid.
 
-I test devono usare dati sintetici e ambienti temporanei. Non devono richiedere accesso ai dispositivi reali dell'utente.
+Tests must use synthetic data and temporary environments. They must not require access to the user's real devices.
 
-## 5. Sicurezza della supply chain e del repository
+## 5. Supply chain and repository security
 
-### 5.1 Segreti
+### 5.1 Secrets
 
-- Abilitare secret scanning e push protection, se disponibili.
-- Non inserire token, password, chiavi private, file `.env` o backup nel repository.
-- Usare GitHub Secrets solo per credenziali strettamente necessarie ai workflow.
-- Non stampare segreti nei log.
-- Revocare e sostituire immediatamente un segreto accidentalmente pubblicato: cancellarlo dal commit più recente non è sufficiente.
+- Enable secret scanning and push protection, where available.
+- Do not place tokens, passwords, private keys, `.env` files, or backups in the repository.
+- Use GitHub Secrets only for credentials strictly necessary for workflows.
+- Do not print secrets in logs.
+- Immediately revoke and replace an accidentally published secret: deleting it from the latest commit is not enough.
 
-### 5.2 Dipendenze
+### 5.2 Dependencies
 
-- Preferire dipendenze mantenute e necessarie.
-- Fissare le versioni e aggiornare in modo controllato.
-- Valutare provenienza, licenza, manutenzione e vulnerabilità note.
-- Usare Dependabot o strumenti equivalenti quando compatibili con il piano e il repository.
-- Le pull request automatiche di aggiornamento devono superare test e controlli prima del merge.
+- Prefer maintained and necessary dependencies.
+- Pin versions and update in a controlled way.
+- Assess provenance, license, maintenance, and known vulnerabilities.
+- Use Dependabot or equivalent tools when compatible with the plan and the repository.
+- Automated update pull requests must pass tests and checks before merging.
 
-### 5.3 Permessi dei workflow
+### 5.3 Workflow permissions
 
-Ogni workflow deve dichiarare esplicitamente i permessi minimi del `GITHUB_TOKEN`. Per le pipeline di test, partire da permessi di sola lettura, ad esempio `contents: read`.
+Every workflow must explicitly declare the minimal `GITHUB_TOKEN` permissions. For test pipelines, start from read-only permissions, for example `contents: read`.
 
-Non usare `write-all`. Non eseguire codice non fidato di Pull Request con segreti disponibili. Per le Pull Request da fork, mantenere i workflow senza privilegi di scrittura e senza segreti.
+Do not use `write-all`. Do not run untrusted Pull Request code with secrets available. For Pull Requests from forks, keep workflows without write privileges and without secrets.
 
-### 5.4 Azioni GitHub
+### 5.4 GitHub Actions
 
-- Preferire azioni ufficiali o ampiamente verificate.
-- Fissare le azioni a una versione stabile e, per i workflow sensibili, al commit SHA completo.
-- Aggiornare periodicamente le versioni fissate.
-- Non eseguire script remoti non verificati.
+- Prefer official or widely verified actions.
+- Pin actions to a stable version and, for sensitive workflows, to the full commit SHA.
+- Periodically update the pinned versions.
+- Do not run unverified remote scripts.
 
-## 6. Scansioni di sicurezza
+## 6. Security scans
 
-La pipeline di sicurezza può includere:
+The security pipeline may include:
 
-| Controllo | Scopo |
+| Check | Purpose |
 |---|---|
-| Secret scanning | Individuare credenziali accidentalmente committate |
-| Dependency scanning | Rilevare vulnerabilità note nelle dipendenze |
-| Static analysis | Individuare classi di errori nel codice |
-| License review | Identificare licenze incompatibili o da valutare |
-| SBOM | Produrre un inventario delle componenti software |
-| Container scanning | Controllare immagini Docker, se utilizzate |
+| Secret scanning | Identify accidentally committed credentials |
+| Dependency scanning | Detect known vulnerabilities in dependencies |
+| Static analysis | Identify classes of errors in the code |
+| License review | Identify incompatible licenses or licenses needing assessment |
+| SBOM | Produce an inventory of software components |
+| Container scanning | Check Docker images, if used |
 
-La scansione non deve essere interpretata come garanzia di assenza di vulnerabilità. Ogni risultato va classificato per severità, impatto e applicabilità al progetto.
+Scanning must not be interpreted as a guarantee that no vulnerabilities exist. Every result must be classified by severity, impact, and applicability to the project.
 
-## 7. Docker: uso facoltativo
+## 7. Docker: optional use
 
-Docker è uno strumento per sviluppo e test, non un requisito di installazione o funzionamento di HSOC.
+Docker is a tool for development and testing, not a requirement for installing or running HSOC.
 
-Usi consentiti e utili:
+Allowed and useful uses:
 
-- ambienti ausiliari riproducibili;
-- test d'integrazione isolati;
-- esecuzione di strumenti di analisi;
-- servizi temporanei di test, se in futuro necessari.
+- reproducible auxiliary environments;
+- isolated integration tests;
+- running analysis tools;
+- temporary test services, if needed in the future.
 
-Vincoli:
+Constraints:
 
-- l'agente desktop HSOC non deve richiedere Docker;
-- non eseguire l'agente con privilegi elevati dentro un container per aggirare i limiti del container;
-- non montare directory personali o socket host senza una necessità documentata;
-- non inserire credenziali nelle immagini;
-- usare immagini di base affidabili, versionate e aggiornate;
-- generare e controllare la SBOM delle immagini, se pubblicate.
+- the HSOC desktop agent must not require Docker;
+- do not run the agent with elevated privileges inside a container to bypass container limits;
+- do not mount personal directories or host sockets without a documented need;
+- do not put credentials in images;
+- use reliable, versioned, updated base images;
+- generate and check the SBOM of images, if published.
 
-Un `Dockerfile` o `compose.yaml` va aggiunto solo quando esiste un caso d'uso concreto. Evitare un Compose composto da servizi fittizi o non necessari.
+A `Dockerfile` or `compose.yaml` should be added only when a concrete use case exists. Avoid a Compose file made of fictitious or unnecessary services.
 
-## 8. CD e release
+## 8. CD and releases
 
-La Continuous Delivery (CD) prepara gli artefatti; la pubblicazione deve essere un passaggio deliberato e verificabile.
+Continuous Delivery (CD) prepares the artifacts; publication must be a deliberate and verifiable step.
 
-### 8.1 Condizioni per una release
+### 8.1 Conditions for a release
 
-Una release non può essere pubblicata come stabile se:
+A release cannot be published as stable if:
 
-- i test obbligatori falliscono;
-- la build non è riproducibile o non è stata verificata;
-- esistono vulnerabilità bloccanti non valutate;
-- mancano note di rilascio;
-- non è stato verificato il percorso di installazione e disinstallazione;
-- backup e ripristino non sono stati testati per le modifiche che coinvolgono i dati.
+- mandatory tests fail;
+- the build is not reproducible or has not been verified;
+- there are blocking vulnerabilities that have not been assessed;
+- release notes are missing;
+- the installation and uninstallation path has not been verified;
+- backup and restore have not been tested for changes involving data.
 
-### 8.2 Artefatti
+### 8.2 Artifacts
 
-In base allo stato reale del progetto, una release potrà contenere:
+Based on the actual state of the project, a release may contain:
 
-- installer Windows;
-- checksum degli artefatti;
+- Windows installer;
+- artifact checksums;
 - SBOM;
-- note di rilascio;
-- istruzioni di aggiornamento e ripristino.
+- release notes;
+- update and restore instructions.
 
-La firma digitale degli installer è raccomandata prima della distribuzione pubblica. Può comportare costi o requisiti esterni: non va promessa come funzionalità gratuita garantita.
+Digital signing of installers is recommended before public distribution. It may involve costs or external requirements: it must not be promised as a guaranteed free feature.
 
-### 8.3 Versionamento
+### 8.3 Versioning
 
-Adottare Semantic Versioning quando l'API e il prodotto saranno sufficientemente stabili:
+Adopt Semantic Versioning when the API and the product are sufficiently stable:
 
-- `MAJOR`: cambiamenti incompatibili;
-- `MINOR`: funzionalità compatibili;
-- `PATCH`: correzioni compatibili.
+- `MAJOR`: incompatible changes;
+- `MINOR`: compatible functionality;
+- `PATCH`: compatible fixes.
 
-Durante lo sviluppo iniziale, usare versioni `0.x` e indicare chiaramente che il software è sperimentale.
+During initial development, use `0.x` versions and clearly state that the software is experimental.
 
-## 9. Documentazione del repository
+## 9. Repository documentation
 
-File minimi:
+Minimum files:
 
-- `README.md`: scopo, stato, requisiti, avvio e struttura;
-- `SECURITY.md`: come segnalare una vulnerabilità in modo responsabile;
-- `CONTRIBUTING.md`: convenzioni, test e Pull Request;
-- `CHANGELOG.md`: modifiche per versione;
-- `LICENSE`: licenza scelta consapevolmente;
-- template Issue e Pull Request.
+- `README.md`: purpose, status, requirements, starting, and structure;
+- `SECURITY.md`: how to report a vulnerability responsibly;
+- `CONTRIBUTING.md`: conventions, tests, and Pull Requests;
+- `CHANGELOG.md`: changes per version;
+- `LICENSE`: consciously chosen license;
+- Issue and Pull Request templates.
 
-Non scegliere una licenza per supposizione: la decisione deve essere esplicita e coerente con le dipendenze e con il modello di distribuzione.
+Do not choose a license by assumption: the decision must be explicit and consistent with the dependencies and the distribution model.
 
-## 10. Criteri di accettazione
+## 10. Acceptance criteria
 
-La configurazione CI/CD è accettabile quando:
+The CI/CD configuration is acceptable when:
 
-1. una Pull Request esegue i controlli previsti per i componenti presenti;
-2. un errore in un controllo obbligatorio impedisce il merge in `main`;
-3. i workflow usano permessi minimi;
-4. i segreti non sono esposti nei log o nei workflow non fidati;
-5. le dipendenze sono controllate;
-6. i test usano dati sintetici e non modificano il sistema host;
-7. Docker non è necessario per installare o avviare HSOC;
-8. una release include artefatti e informazioni verificabili;
-9. le scansioni e i risultati sono conservati in modo consultabile;
-10. ogni controllo non ancora implementato è dichiarato come tale.
+1. a Pull Request runs the planned checks for the components present;
+2. an error in a mandatory check prevents merging into `main`;
+3. workflows use minimal permissions;
+4. secrets are not exposed in logs or in untrusted workflows;
+5. dependencies are checked;
+6. tests use synthetic data and do not modify the host system;
+7. Docker is not required to install or start HSOC;
+8. a release includes verifiable artifacts and information;
+9. scans and results are retained in a consultable form;
+10. every check not yet implemented is declared as such.
 
-## 11. Sequenza d'implementazione
+## 11. Implementation sequence
 
-| Fase | Attività | Priorità |
+| Phase | Activity | Priority |
 |---|---|---|
-| 1 | Creare repository e struttura minima | P0 |
-| 2 | Aggiungere README, SECURITY, CONTRIBUTING, LICENSE da decidere e CHANGELOG | P0 |
-| 3 | Configurare CI Go per formattazione, analisi, test e build | P0 |
-| 4 | Proteggere `main` e rendere obbligatori i controlli CI | P0 |
-| 5 | Aggiungere scansione segreti e dipendenze | P0 |
-| 6 | Aggiungere test d'integrazione e test backup/restore | P0 |
-| 7 | Aggiungere CI dashboard, Rust e Python quando i moduli esistono | P1 |
-| 8 | Introdurre Docker solo per casi d'uso di sviluppo/test documentati | P1 |
-| 9 | Preparare workflow di release e SBOM | P1 |
-| 10 | Valutare firma degli installer e matrice Linux/macOS | P2 |
+| 1 | Create the repository and the minimal structure | P0 |
+| 2 | Add README, SECURITY, CONTRIBUTING, LICENSE to be decided, and CHANGELOG | P0 |
+| 3 | Configure Go CI for formatting, analysis, tests, and build | P0 |
+| 4 | Protect `main` and make CI checks mandatory | P0 |
+| 5 | Add secret and dependency scanning | P0 |
+| 6 | Add integration tests and backup/restore tests | P0 |
+| 7 | Add dashboard, Rust, and Python CI when the modules exist | P1 |
+| 8 | Introduce Docker only for documented development/test use cases | P1 |
+| 9 | Prepare the release workflow and SBOM | P1 |
+| 10 | Evaluate installer signing and the Linux/macOS matrix | P2 |
 
-## 12. Decisioni ancora da confermare
+## 12. Decisions still to be confirmed
 
-| ID | Decisione | Stato |
+| ID | Decision | Status |
 |---|---|---|
-| ADR-CI-01 | GitHub Actions come piattaforma CI | Scelta di progetto da configurare |
-| ADR-CI-02 | `main` protetto con Pull Request e controlli obbligatori | Proposta |
-| ADR-CI-03 | Windows come primo target CI completo | Coerente con la direzione del progetto |
-| ADR-CI-04 | Docker facoltativo, non richiesto all'utente finale | Confermata |
-| ADR-CI-05 | Strumenti di scansione e soglie di blocco | Da definire durante l'implementazione |
-| ADR-CI-06 | Licenza del progetto | Da decidere |
-| ADR-CI-07 | Strategia di firma e distribuzione degli installer | Da decidere |
+| ADR-CI-01 | GitHub Actions as the CI platform | Project choice to be configured |
+| ADR-CI-02 | `main` protected with Pull Requests and mandatory checks | Proposal |
+| ADR-CI-03 | Windows as the first complete CI target | Consistent with the project direction |
+| ADR-CI-04 | Docker optional, not required of the end user | Confirmed |
+| ADR-CI-05 | Scanning tools and blocking thresholds | To be defined during implementation |
+| ADR-CI-06 | Project license | To be decided |
+| ADR-CI-07 | Installer signing and distribution strategy | To be decided |
 
-## 13. Distinzione tra specificato, implementato e verificato
+## 13. Distinction between specified, implemented, and verified
 
-Questo documento descrive una configurazione proposta. La presenza di un workflow in questa specifica non significa che il workflow sia stato creato, eseguito o superato.
+This document describes a proposed configuration. The presence of a workflow in this specification does not mean the workflow has been created, executed, or passed.
 
-Per ogni componente mantenere tre stati distinti:
+For each component, keep three distinct states:
 
-- **SPECIFICATO:** comportamento e controlli descritti;
-- **IMPLEMENTATO:** file, codice e configurazione presenti nel repository;
-- **VERIFICATO:** controlli eseguiti e risultati registrati.
+- **SPECIFIED:** behavior and checks described;
+- **IMPLEMENTED:** files, code, and configuration present in the repository;
+- **VERIFIED:** checks executed and results recorded.
 
-Non dichiarare una release, una scansione o un test come superati senza un risultato verificabile.
+Do not declare a release, a scan, or a test as passed without a verifiable result.
 
 ---
 
-**Fine del Documento 16 – GitHub, CI/CD e DevSecOps**
+**End of Document 16 – GitHub, CI/CD, and DevSecOps**
 
 
-## 14. Decisioni HSOC consolidate nella revisione 1.1
+## 14. HSOC decisions consolidated in revision 1.1
 
-- Licenza del progetto: MIT (`LICENSE` nella radice del repository).
-- Repository: monorepo GitHub.
+- Project license: MIT (`LICENSE` at the repository root).
+- Repository: GitHub monorepo.
 - Dashboard: Tauri + React + TypeScript.
-- Linguaggi approvati: Go, Rust e Python. Go è il core e unico writer SQLite; Rust è destinato a componenti specialistici di sicurezza; Python a worker e analisi ausiliarie.
-- La CI comprende workflow distinti per Go, Rust, Python e dashboard, applicati ai componenti effettivamente presenti.
-- Docker è facoltativo e limitato a sviluppo/test; non è richiesto all'utente finale.
-- Agenti remoti: implementazione funzionale dalla V2; nella V1 sono esclusi listener e agenti remoti.
-- Windows x86-64 è il primo target; Linux/macOS verranno aggiunti dopo la stabilizzazione.
+- Approved languages: Go, Rust, and Python. Go is the core and sole SQLite writer; Rust is intended for specialist security components; Python for workers and auxiliary analysis.
+- CI includes distinct workflows for Go, Rust, Python, and the dashboard, applied to the components actually present.
+- Docker is optional and limited to development/testing; it is not required of the end user.
+- Remote agents: functional implementation from V2; V1 excludes remote listeners and agents.
+- Windows x86-64 is the first target; Linux/macOS will be added after stabilization.
 
-La decisione di usare tre linguaggi non implica tre processi obbligatori per ogni funzione. Ogni componente deve avere responsabilità, contratto, test e piano di packaging definiti. La documentazione non prova che i workflow siano già configurati nel repository.
+The decision to use three languages does not imply three mandatory processes for every function. Every component must have defined responsibilities, contract, tests, and packaging plan. The documentation does not prove that the workflows are already configured in the repository.

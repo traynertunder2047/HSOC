@@ -1,24 +1,24 @@
 # HSOC — API & IPC Specification
 
-**Versione:** 1.1-draft | **Stato:** contratti da consolidare
+**Version:** 1.1-draft | **Status:** contracts to be consolidated
 
-## 1. Obiettivo
+## 1. Objective
 
-Definire la comunicazione tra dashboard desktop e servizio Go locale, senza accesso diretto al database. L'IPC è un confine di sicurezza: input della UI sempre non fidato.
+Define communication between the desktop dashboard and the local Go service, without direct database access. IPC is a security boundary: UI input is always untrusted.
 
-## 2. Architettura
+## 2. Architecture
 
-- V1 Windows: valutare Named Pipes locali.
-- ACL restrittive: solo account/sessione autorizzati.
-- Il servizio verifica identità/permessi del client, non si fida del solo nome del pipe.
-- Nessun listener TCP esposto per default.
-- UI può connettersi/disconnettersi senza fermare il servizio.
-- Il servizio può funzionare senza UI.
-- Protocollo con versione esplicita e compatibilità controllata.
+- V1 Windows: evaluate local Named Pipes.
+- Restrictive ACLs: only authorized accounts/sessions.
+- The service verifies the client's identity/permissions and does not trust the pipe name alone.
+- No TCP listener exposed by default.
+- The UI can connect/disconnect without stopping the service.
+- The service can operate without the UI.
+- Protocol with an explicit version and controlled compatibility.
 
-## 3. Famiglie di operazioni
+## 3. Operation families
 
-| Famiglia | Operazioni |
+| Family | Operations |
 |---|---|
 | Health | `GetHealth`, `GetVersion`, `GetCapabilities` |
 | Events | `ListEvents`, `GetEvent` |
@@ -33,11 +33,11 @@ Definire la comunicazione tra dashboard desktop e servizio Go locale, senza acce
 | Simulation | `RunSimulation`, `GetSimulationResult` |
 | Notifications | `GetNotificationStatus`, `TestNotification` |
 
-Le operazioni distruttive o sensibili richiedono autorizzazione, audit e, dove previsto, approvazione esplicita.
+Destructive or sensitive operations require authorization, audit, and, where specified, explicit approval.
 
-## 4. Contratto messaggio
+## 4. Message contract
 
-Formato logico consigliato:
+Recommended logical format:
 ```json
 {
   "protocol_version": "1",
@@ -50,7 +50,7 @@ Formato logico consigliato:
 }
 ```
 
-Risposta:
+Response:
 ```json
 {
   "protocol_version": "1",
@@ -61,11 +61,11 @@ Risposta:
 }
 ```
 
-I nomi e i tipi sono illustrativi: lo schema formale deve essere versionato e validato. Non inserire segreti nei metadata.
+Names and types are illustrative: the formal schema must be versioned and validated. Do not include secrets in metadata.
 
 ## 5. Error model
 
-Codici logici:
+Logical codes:
 - `INVALID_ARGUMENT`
 - `UNAUTHENTICATED`
 - `PERMISSION_DENIED`
@@ -77,32 +77,32 @@ Codici logici:
 - `INTERNAL`
 - `UNSUPPORTED_VERSION`
 
-Gli errori non devono esporre stack trace, path sensibili, token o dettagli interni alla UI. I log tecnici possono contenere correlation ID e contesto redatto.
+Errors must not expose stack traces, sensitive paths, tokens, or internal details to the UI. Technical logs may contain correlation IDs and redacted context.
 
-## 6. Regole IPC
+## 6. IPC rules
 
-1. Validare dimensione massima del messaggio.
-2. Validare schema, enum, range e encoding.
-3. Applicare timeout e cancellazione.
-4. Limitare richieste concorrenti e rate.
-5. Rifiutare versioni non supportate.
-6. Non eseguire shell command da input IPC.
-7. Autorizzare ogni operazione sensibile sul lato Go.
-8. Auditare cambi di configurazione, policy, restore e azioni.
-9. Nessun segreto in chiaro nei log.
-10. Chiudere il canale in modo pulito e recuperare da UI riavviata.
+1. Validate the maximum message size.
+2. Validate schema, enums, ranges, and encoding.
+3. Apply timeouts and cancellation.
+4. Limit concurrent requests and rates.
+5. Reject unsupported versions.
+6. Do not execute shell commands from IPC input.
+7. Authorize every sensitive operation on the Go side.
+8. Audit configuration changes, policies, restores, and actions.
+9. No plaintext secrets in logs.
+10. Close the channel cleanly and recover from a restarted UI.
 
-## 7. Autorizzazione
+## 7. Authorization
 
-- Nessun login HSOC dedicato nella V1.
-- Usare l'identità Windows e ACL del canale locale.
-- La UI non è automaticamente trusted: il servizio valida ogni richiesta.
-- Per operazioni che richiedono elevazione, preferire helper/operazione circoscritta e documentata; non rendere tutto il servizio amministratore.
-- Confermare esplicitamente restore, modifiche policy e azioni con impatto.
+- No dedicated HSOC login in V1.
+- Use the Windows identity and the local channel ACL.
+- The UI is not automatically trusted: the service validates every request.
+- For operations requiring elevation, prefer a scoped and documented helper/operation; do not make the entire service an administrator.
+- Explicitly confirm restores, policy changes, and actions with impact.
 
-## 8. Eventi push
+## 8. Push events
 
-Possibili notifiche dal servizio:
+Possible notifications from the service:
 - `health.changed`
 - `event.received`
 - `detection.created`
@@ -111,55 +111,55 @@ Possibili notifiche dal servizio:
 - `backup.completed`
 - `configuration.changed`
 
-Gli eventi push sono informativi; la UI deve poter recuperare lo stato tramite query se perde una notifica.
+Push events are informational; the UI must be able to retrieve state through queries if it misses a notification.
 
-## 9. Versionamento
+## 9. Versioning
 
-- `protocol_version` obbligatoria.
-- Aggiunte compatibili preferite; rimozioni/semantica diversa richiedono versione nuova.
-- UI e servizio negoziano capabilities.
-- Test di compatibilità tra UI N e servizio N-1 secondo matrice release.
-- Contratti e tipi generati o verificati da schema condiviso.
+- `protocol_version` is mandatory.
+- Compatible additions preferred; removals/different semantics require a new version.
+- UI and service negotiate capabilities.
+- Compatibility tests between UI N and service N-1 according to the release matrix.
+- Contracts and types generated or verified from a shared schema.
 
-## 10. Test IPC
+## 10. IPC tests
 
-| ID | Test | Risultato atteso |
+| ID | Test | Expected result |
 |---|---|---|
-| IPC-001 | UI autorizzata si connette | Connessione stabilita |
-| IPC-002 | Client non autorizzato | Connessione/richiesta negata |
-| IPC-003 | Payload malformato | Rifiuto controllato |
-| IPC-004 | Payload oltre limite | Rifiuto senza consumo eccessivo |
-| IPC-005 | Timeout servizio | UI mostra stato non disponibile |
-| IPC-006 | Versione protocollo sconosciuta | `UNSUPPORTED_VERSION` |
-| IPC-007 | Request ID duplicato | Comportamento deterministico documentato |
-| IPC-008 | Richiesta non autorizzata di restore | Negata e auditata |
-| IPC-009 | UI chiusa durante push | Servizio continua, UI recupera stato |
-| IPC-010 | Input contenente comandi | Trattato come dato, mai eseguito |
-| IPC-011 | Flood di richieste | Rate/concurrency limit applicati |
-| IPC-012 | Segreti in errore | Nessuna divulgazione nei messaggi/log |
+| IPC-001 | Authorized UI connects | Connection established |
+| IPC-002 | Unauthorized client | Connection/request denied |
+| IPC-003 | Malformed payload | Controlled rejection |
+| IPC-004 | Payload over the limit | Rejected without excessive consumption |
+| IPC-005 | Service timeout | UI shows an unavailable state |
+| IPC-006 | Unknown protocol version | `UNSUPPORTED_VERSION` |
+| IPC-007 | Duplicate request ID | Documented deterministic behavior |
+| IPC-008 | Unauthorized restore request | Denied and audited |
+| IPC-009 | UI closed during push | Service continues, UI recovers state |
+| IPC-010 | Input containing commands | Treated as data, never executed |
+| IPC-011 | Request flood | Rate/concurrency limit applied |
+| IPC-012 | Secrets in an error | No disclosure in messages/logs |
 
-## Aggiornamento architetturale 1.1 – decisioni consolidate (15-11-2026)
+## Architectural update 1.1 – consolidated decisions (2026-11-15)
 
-Le seguenti decisioni prevalgono su eventuali formulazioni precedenti in questo documento:
+The following decisions supersede any earlier wording in this document:
 
-- **Licenza del progetto:** MIT. Il testo completo è nel file `LICENSE` alla radice del repository. Le licenze delle dipendenze restano da verificare e rispettare separatamente.
-- **Repository:** monorepo GitHub, con codice, documentazione, test e configurazioni di build nello stesso repository.
-- **Dashboard desktop:** Tauri + React + TypeScript. Il runtime Rust interno a Tauri è distinto dai moduli Rust specialistici HSOC.
-- **Stack applicativo:** Go + Rust + Python. Go è il core e l'unica autorità di scrittura su SQLite; Rust implementa componenti specialistici di sicurezza; Python implementa worker e attività ausiliarie di analisi. Le responsabilità devono restare separate e i confini tra processi/moduli documentati.
-- **Introduzione graduale:** i tre linguaggi fanno parte dello stack approvato, ma le rispettive componenti vengono integrate per fasi verticali verificabili; non si creano cartelle o moduli vuoti e un worker non deve diventare un punto singolo di guasto del core.
-- **Docker:** facoltativo, riservato ad ambienti di sviluppo/test o servizi ausiliari isolati. Non è prerequisito di installazione o funzionamento per l'utente HSOC.
-- **Agenti remoti:** esclusi dalla V1; progettazione e implementazione funzionale dalla V2+. Nella V1 si possono definire contratti e schemi versionati per evitare una futura riprogettazione, senza aprire listener remoti.
-- **Piattaforma iniziale:** Windows x86-64; Linux e macOS restano evoluzioni successive.
-- **Tracciabilità:** requisiti, documenti, componenti, test ed evidenze devono essere collegati nella matrice del Documento 14.
+- **Project license:** MIT. The full text is in the `LICENSE` file at the repository root. Dependency licenses must still be verified and respected separately.
+- **Repository:** GitHub monorepo, with code, documentation, tests, and build configurations in the same repository.
+- **Desktop dashboard:** Tauri + React + TypeScript. The Rust runtime inside Tauri is distinct from the HSOC specialist Rust modules.
+- **Application stack:** Go + Rust + Python. Go is the core and the sole authority for writing to SQLite; Rust implements specialist security components; Python implements workers and auxiliary analysis tasks. Responsibilities must remain separate and process/module boundaries documented.
+- **Gradual introduction:** the three languages are part of the approved stack, but their components are integrated in verifiable vertical phases; no empty folders or modules are created, and a worker must not become a single point of failure for the core.
+- **Docker:** optional, reserved for development/test environments or isolated auxiliary services. It is not a prerequisite for installation or operation for the HSOC user.
+- **Remote agents:** excluded from V1; design and functional implementation from V2+. V1 may define versioned contracts and schemas to avoid a future redesign, without opening remote listeners.
+- **Initial platform:** Windows x86-64; Linux and macOS remain subsequent evolutions.
+- **Traceability:** requirements, documents, components, tests, and evidence must be linked in the Document 14 matrix.
 
-Queste decisioni aggiornano la baseline progettuale, non attestano che codice, workflow CI, installer o test siano già stati implementati o verificati.
+These decisions update the design baseline; they do not attest that code, CI workflows, installers, or tests have already been implemented or verified.
 
-### Compatibilità con lo stack approvato
+### Compatibility with the approved stack
 
-L'IPC desktop V1 collega la dashboard Tauri/React/TypeScript al servizio Go. I moduli Rust specialistici e i worker Python comunicano con Go tramite interfacce interne ristrette e versionate; non devono essere trattati come client privilegiati. Ogni messaggio proveniente da un componente separato è validato come input non fidato.
+The V1 desktop IPC connects the Tauri/React/TypeScript dashboard to the Go service. The specialist Rust modules and Python workers communicate with Go through narrow, versioned internal interfaces; they must not be treated as privileged clients. Every message coming from a separate component is validated as untrusted input.
 
-Gli schemi in `protocols/` devono distinguere:
-- IPC locale dashboard-servizio V1;
-- contratti interni Go-Rust e Go-Python;
-- schemi di eventi e dati;
-- futuri contratti agente remoto V2, disattivati e non esposti nella V1.
+The schemas in `protocols/` must distinguish:
+- V1 dashboard-service local IPC;
+- internal Go-Rust and Go-Python contracts;
+- event and data schemas;
+- future V2 remote agent contracts, disabled and not exposed in V1.

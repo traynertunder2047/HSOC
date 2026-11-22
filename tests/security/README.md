@@ -1,3 +1,3 @@
 # tests/security
 
-Test di sicurezza difensivi e non distruttivi.
+Defensive, non-destructive security tests.

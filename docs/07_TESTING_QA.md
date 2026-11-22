@@ -1,170 +1,168 @@
 # HSOC — Testing & Quality Assurance
 
-**Versione:** 1.1-draft | **Stato:** piano di test, non report di esecuzione
+**Version:** 1.1-draft | **Status:** test plan, not an execution report
 
-## 1. Obiettivo
+## 1. Objective
 
-Dimostrare con prove ripetibili che ogni requisito implementato funziona, che i regressions sono intercettati e che il software gestisce errori e recovery in modo sicuro.
+Demonstrate with repeatable evidence that every implemented requirement works, that regressions are caught, and that the software handles errors and recovery safely.
 
-## 2. Livelli di test
+## 2. Test levels
 
-- **Unit:** funzioni, parser, normalizer, scoring, config, repository.
-- **Integration:** DB, IPC, migrazioni, notifiche mock, backup.
-- **System:** installazione, servizio, UI, flussi end-to-end.
-- **Security:** ACL, autorizzazione, input validation, segreti, update.
+- **Unit:** functions, parsers, normalizer, scoring, config, repositories.
+- **Integration:** DB, IPC, migrations, mock notifications, backup.
+- **System:** installation, service, UI, end-to-end flows.
+- **Security:** ACLs, authorization, input validation, secrets, updates.
 - **Reliability:** crash, restart, disk full, DB busy, backup/restore.
-- **Performance:** CPU, RAM, I/O, crescita DB su carico sintetico.
-- **Detection quality:** precision, recall, falsi positivi e falsi negativi su dataset etichettato.
-- **Compatibility:** OS supportati e combinazioni UI/service.
-- **Acceptance:** criteri MVP e release gate.
+- **Performance:** CPU, RAM, I/O, DB growth under synthetic load.
+- **Detection quality:** precision, recall, false positives and false negatives on a labeled dataset.
+- **Compatibility:** supported OS versions and UI/service combinations.
+- **Acceptance:** MVP criteria and release gates.
 
-## 3. Test case obbligatorio
+## 3. Mandatory test case
 
-Ogni test deve avere:
-- ID stabile;
-- requisito `TR-*` collegato;
-- titolo e obiettivo;
-- versione/commit;
-- prerequisiti e ambiente;
+Every test must have:
+- a stable ID;
+- a linked `TR-*` requirement;
+- title and objective;
+- version/commit;
+- prerequisites and environment;
 - fixture/input;
-- procedura riproducibile;
-- risultato atteso;
-- risultato effettivo;
-- evidenza (log, screenshot, report);
-- stato: `NOT RUN`, `PASS`, `FAIL`, `BLOCKED`, `SKIPPED`;
-- autore e data.
+- reproducible procedure;
+- expected result;
+- actual result;
+- evidence (logs, screenshots, reports);
+- status: `NOT RUN`, `PASS`, `FAIL`, `BLOCKED`, `SKIPPED`;
+- author and date.
 
-## 4. Catalogo minimo
+## 4. Minimum catalog
 
-### Core e integrazione
-- INT-01: avvio servizio e health.
+### Core and integration
+- INT-01: service startup and health.
 - INT-02: collector → normalizer.
 - INT-03: normalizer → storage.
 - INT-04: detection → incident.
 - INT-05: IPC → UI.
-- INT-06: config reload valid.
-- INT-07: config reload invalid.
-- INT-08: audit operazione sensibile.
-- INT-09: worker opzionale assente.
-- INT-10: recupero dopo disconnessione UI.
+- INT-06: valid config reload.
+- INT-07: invalid config reload.
+- INT-08: audit of a sensitive operation.
+- INT-09: optional worker missing.
+- INT-10: recovery after UI disconnection.
 
 ### Detection
-- DET-01..05: regole positive con fixture note.
-- DET-06..08: eventi negativi simili ma benigni.
+- DET-01..05: positive rules with known fixtures.
+- DET-06..08: similar but benign negative events.
 - DET-09: dedup.
-- DET-10: correlazione.
+- DET-10: correlation.
 - DET-11: severity.
 - DET-12: confidence.
-- DET-13: versione regola.
-- DET-14: evento incompleto/malformato.
-- DET-15: regressione su dataset storico sintetico.
+- DET-13: rule version.
+- DET-14: incomplete/malformed event.
+- DET-15: regression on a synthetic historical dataset.
 
-### Configurazione
-- CFG-01..05: default e schema.
-- CFG-06..08: precedence e override.
-- CFG-09: policy obbligatoria non disattivabile.
-- CFG-10: reload atomico.
-- CFG-11: rollback config.
-- CFG-12: segreti in credential store.
+### Configuration
+- CFG-01..05: defaults and schema.
+- CFG-06..08: precedence and overrides.
+- CFG-09: mandatory policy that cannot be disabled.
+- CFG-10: atomic reload.
+- CFG-11: config rollback.
+- CFG-12: secrets in the credential store.
 - CFG-13: config backup/restore.
-- CFG-14: input invalido.
-- CFG-15: audit modifiche.
+- CFG-14: invalid input.
+- CFG-15: audit of changes.
 
 ### Deployment
-- DEP-01..14: fare riferimento al Documento 05; mantenere evidenza per ogni OS/build testata.
+- DEP-01..14: refer to Document 05; keep evidence for every tested OS/build.
 
 ### Recovery
-- REC-01: backup completo.
-- REC-02: checksum errato.
-- REC-03: restore su DB di test.
-- REC-04: restore interrotto.
-- REC-05: recovery dopo crash.
-- REC-06: migrazione fallita.
-- REC-07: DB read-only.
-- REC-08: spazio insufficiente.
+- REC-01: full backup.
+- REC-02: wrong checksum.
+- REC-03: restore onto a test DB.
+- REC-04: interrupted restore.
+- REC-05: recovery after a crash.
+- REC-06: failed migration.
+- REC-07: read-only DB.
+- REC-08: insufficient space.
 
-## 5. Metriche detection
+## 5. Detection metrics
 
-Per categoria e soglia:
-- TP: veri positivi;
-- FP: falsi positivi;
-- TN: veri negativi;
-- FN: falsi negativi;
+Per category and threshold:
+- TP: true positives;
+- FP: false positives;
+- TN: true negatives;
+- FN: false negatives;
 - Precision = TP / (TP + FP);
 - Recall = TP / (TP + FN);
-- F1 = media armonica di precision e recall.
+- F1 = harmonic mean of precision and recall.
 
-Riportare supporto del dataset, periodo, versione regole, soglia e limiti. Non usare un unico punteggio aggregato per nascondere categorie deboli. Non ottimizzare soltanto la riduzione degli alert: un sistema che non segnala nulla può avere pochi FP ma anche molti FN.
+Report dataset support, period, rule version, threshold, and limitations. Do not use a single aggregate score to hide weak categories. Do not optimize only alert reduction: a system that reports nothing can have few FPs but also many FNs.
 
-## 6. Criteri di qualità
+## 6. Quality criteria
 
-- Nessun crash non gestito nei test di regressione.
-- Nessun difetto critico/alto aperto senza accettazione formale del rischio.
-- Backup e restore superati.
-- Tutti i test P0 passati o bloccati con motivazione approvata.
-- Nessun segreto rilevato dai secret scanner.
-- Nessuna vulnerabilità critica non mitigata nelle dipendenze.
-- Performance entro budget definiti prima del benchmark.
-- Ogni requisito P0 ha almeno un test associato.
+- No unhandled crash in regression tests.
+- No open critical/high defect without formal risk acceptance.
+- Backup and restore passed.
+- All P0 tests passed or blocked with an approved justification.
+- No secrets found by secret scanners.
+- No unmitigated critical vulnerability in dependencies.
+- Performance within budgets defined before benchmarking.
+- Every P0 requirement has at least one associated test.
 
-## 7. Test performance da definire
+## 7. Performance tests to be defined
 
-Misurare baseline su hardware di riferimento dichiarato:
-- idle CPU/RAM del servizio;
-- picco CPU durante ingest;
-- throughput eventi sintetici;
-- latenza ingest-to-dashboard;
-- dimensione DB per giorno/volume;
-- tempo backup/restore;
-- comportamento con DB grande.
+Measure the baseline on declared reference hardware:
+- idle CPU/RAM of the service;
+- CPU peak during ingest;
+- synthetic event throughput;
+- ingest-to-dashboard latency;
+- DB size per day/volume;
+- backup/restore time;
+- behavior with a large DB.
 
-Non fissare soglie arbitrarie prima di avere una baseline realistica.
+Do not set arbitrary thresholds before having a realistic baseline.
 
-## 8. CI consigliata
+## 8. Recommended CI
 
-- Go: `gofmt`, `go test ./...`, `go vet ./...`, `govulncheck`.
 - Go: `gofmt` check, `go vet`, `go test ./...`, `govulncheck`.
 - Rust: `cargo fmt --check`, `cargo clippy -- -D warnings`, `cargo test`, `cargo audit`.
 - Python: `ruff check`, `ruff format --check`, `pytest`, `pip-audit`.
-- Dashboard Tauri/React/TypeScript: lint, typecheck, test e build.
-- Tutti i controlli si applicano ai componenti effettivamente presenti nel repository; il piano prevede workflow separati per ciascuno.
-- UI: typecheck, lint, test e build.
+- Tauri/React/TypeScript dashboard: lint, typecheck, tests, and build.
+- All checks apply to the components actually present in the repository; the plan foresees separate workflows for each.
 - Secret scanning: Gitleaks.
-- Vulnerability/dependency inventory: OSV-Scanner o strumento equivalente.
-- Test migrazioni e backup in pipeline isolata.
+- Vulnerability/dependency inventory: OSV-Scanner or an equivalent tool.
+- Migration and backup tests in an isolated pipeline.
 
-## 9. Gate release
+## 9. Release gate
 
-**GO** se: build, test P0, test security, backup/restore, install/update e documentazione sono verificati.  
-**NO-GO** se: test critici falliscono, firma update non verificabile, restore non funziona, segreti sono esposti o esistono bug che possono corrompere dati o causare azioni non autorizzate.
+**GO** if: build, P0 tests, security tests, backup/restore, install/update, and documentation are verified.  
+**NO-GO** if: critical tests fail, the update signature cannot be verified, restore does not work, secrets are exposed, or bugs exist that can corrupt data or cause unauthorized actions.
 
 ## 10. Test report
 
-Non marcare mai un test PASS senza output/evidenza. I test non eseguiti restano NOT RUN. Un test bloccato non equivale a PASS.
+Never mark a test PASS without output/evidence. Tests not executed remain NOT RUN. A blocked test is not equivalent to PASS.
 
-## Aggiornamento architetturale 1.1 – decisioni consolidate (15-11-2026)
+## Architectural update 1.1 – consolidated decisions (2026-11-15)
 
-Le seguenti decisioni prevalgono su eventuali formulazioni precedenti in questo documento:
+The following decisions supersede any earlier wording in this document:
 
-- **Licenza del progetto:** MIT. Il testo completo è nel file `LICENSE` alla radice del repository. Le licenze delle dipendenze restano da verificare e rispettare separatamente.
-- **Repository:** monorepo GitHub, con codice, documentazione, test e configurazioni di build nello stesso repository.
-- **Dashboard desktop:** Tauri + React + TypeScript. Il runtime Rust interno a Tauri è distinto dai moduli Rust specialistici HSOC.
-- **Stack applicativo:** Go + Rust + Python. Go è il core e l'unica autorità di scrittura su SQLite; Rust implementa componenti specialistici di sicurezza; Python implementa worker e attività ausiliarie di analisi. Le responsabilità devono restare separate e i confini tra processi/moduli documentati.
-- **Introduzione graduale:** i tre linguaggi fanno parte dello stack approvato, ma le rispettive componenti vengono integrate per fasi verticali verificabili; non si creano cartelle o moduli vuoti e un worker non deve diventare un punto singolo di guasto del core.
-- **Docker:** facoltativo, riservato ad ambienti di sviluppo/test o servizi ausiliari isolati. Non è prerequisito di installazione o funzionamento per l'utente HSOC.
-- **Agenti remoti:** esclusi dalla V1; progettazione e implementazione funzionale dalla V2+. Nella V1 si possono definire contratti e schemi versionati per evitare una futura riprogettazione, senza aprire listener remoti.
-- **Piattaforma iniziale:** Windows x86-64; Linux e macOS restano evoluzioni successive.
-- **Tracciabilità:** requisiti, documenti, componenti, test ed evidenze devono essere collegati nella matrice del Documento 14.
+- **Project license:** MIT. The full text is in the `LICENSE` file at the repository root. Dependency licenses must still be verified and respected separately.
+- **Repository:** GitHub monorepo, with code, documentation, tests, and build configurations in the same repository.
+- **Desktop dashboard:** Tauri + React + TypeScript. The Rust runtime inside Tauri is distinct from the HSOC specialist Rust modules.
+- **Application stack:** Go + Rust + Python. Go is the core and the sole authority for writing to SQLite; Rust implements specialist security components; Python implements workers and auxiliary analysis tasks. Responsibilities must remain separate and process/module boundaries documented.
+- **Gradual introduction:** the three languages are part of the approved stack, but their components are integrated in verifiable vertical phases; no empty folders or modules are created, and a worker must not become a single point of failure for the core.
+- **Docker:** optional, reserved for development/test environments or isolated auxiliary services. It is not a prerequisite for installation or operation for the HSOC user.
+- **Remote agents:** excluded from V1; design and functional implementation from V2+. V1 may define versioned contracts and schemas to avoid a future redesign, without opening remote listeners.
+- **Initial platform:** Windows x86-64; Linux and macOS remain subsequent evolutions.
+- **Traceability:** requirements, documents, components, tests, and evidence must be linked in the Document 14 matrix.
 
-Queste decisioni aggiornano la baseline progettuale, non attestano che codice, workflow CI, installer o test siano già stati implementati o verificati.
+These decisions update the design baseline; they do not attest that code, CI workflows, installers, or tests have already been implemented or verified.
 
-### Test dei confini multi-linguaggio
+### Testing multi-language boundaries
 
-Aggiungere test per:
-- input malformato e payload oltre il limite tra Go e Rust;
-- timeout, crash e riavvio di worker Python;
-- schema/versione incompatibile tra componenti;
-- risultato incompleto o non valido restituito da un worker;
-- conferma che solo Go scriva su SQLite;
-- dashboard che comunica solo tramite IPC autorizzato;
-- build desktop senza Docker installato.
+Add tests for:
+- malformed input and payloads over the limit between Go and Rust;
+- Python worker timeouts, crashes, and restarts;
+- incompatible schema/version between components;
+- incomplete or invalid results returned by a worker;
+- confirmation that only Go writes to SQLite;
+- the dashboard communicating only through authorized IPC;
+- a desktop build without Docker installed.

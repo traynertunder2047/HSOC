@@ -1,3 +1,3 @@
 # tests/backup-restore
 
-Test di backup, ripristino e integrità.
+Backup, restore, and integrity tests.

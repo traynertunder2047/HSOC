@@ -1,3 +1,3 @@
 # installers/windows
 
-Packaging e installazione Windows, da introdurre dopo la prima build verificabile.
+Windows packaging and installation, to be introduced after the first verifiable build.

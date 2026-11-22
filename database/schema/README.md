@@ -1,3 +1,3 @@
 # database/schema
 
-Schema logico SQLite e documentazione delle tabelle.
+Logical SQLite schema and table documentation.

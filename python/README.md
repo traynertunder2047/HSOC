@@ -1,3 +1,3 @@
 # python
 
-Worker e analisi ausiliarie Python. Input/output validati; nessun accesso diretto a SQLite.
+Python workers and auxiliary analysis. Validated input/output; no direct access to SQLite.

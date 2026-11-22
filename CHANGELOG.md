@@ -1,13 +1,13 @@
 # Changelog
 
-## Documentazione 1.1-draft – 2026-11-15
-- Consolidata licenza MIT.
-- Confermato monorepo GitHub.
-- Confermata dashboard Tauri + React + TypeScript.
-- Confermato stack Go + Rust + Python con responsabilità distinte.
-- Docker definito facoltativo per sviluppo/test.
-- Agenti remoti collocati in V2+.
-- Aggiornati documenti 00–16 e matrice di tracciabilità.
-- Aggiunti file iniziali di governance del repository.
+## Documentation 1.1-draft – 2026-11-15
+- Consolidated the MIT license.
+- Confirmed the GitHub monorepo.
+- Confirmed the Tauri + React + TypeScript dashboard.
+- Confirmed the Go + Rust + Python stack with distinct responsibilities.
+- Defined Docker as optional for development/testing.
+- Placed remote agents in V2+.
+- Updated documents 00–16 and the traceability matrix.
+- Added the initial repository governance files.
 
-Questa voce descrive modifiche documentali, non release software.
+This entry describes documentation changes, not software releases.

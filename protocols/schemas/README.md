@@ -1,3 +1,3 @@
 # protocols/schemas
 
-Schemi e versioni dei payload.
+Payload schemas and versions.

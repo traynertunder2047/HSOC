@@ -1,3 +1,3 @@
 # docker
 
-Configurazioni Docker facoltative per sviluppo/test. Docker non è requisito per utenti HSOC.
+Optional Docker configurations for development/testing. Docker is not a requirement for HSOC users.

@@ -1,3 +1,3 @@
 # protocols/messages
 
-Contratti interni Go-Rust e Go-Python; contratti remoti futuri non attivi in V1.
+Internal Go-Rust and Go-Python contracts; future remote contracts are not active in V1.

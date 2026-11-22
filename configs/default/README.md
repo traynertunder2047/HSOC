@@ -1,3 +1,3 @@
 # configs/default
 
-Configurazioni predefinite conservative e documentate.
+Conservative, documented default configurations.

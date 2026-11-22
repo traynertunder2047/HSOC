@@ -1,3 +1,3 @@
 # database/migrations
 
-Migrazioni versionate gestite esclusivamente dal servizio Go.
+Versioned migrations managed exclusively by the Go service.

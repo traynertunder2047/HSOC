@@ -1,3 +1,3 @@
 # configs/windows
 
-Configurazioni specifiche per il primo target Windows.
+Configurations specific to the first Windows target.

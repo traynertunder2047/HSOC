@@ -1,3 +1,3 @@
 # protocols/events
 
-Schemi versionati degli eventi interni.
+Versioned schemas for internal events.

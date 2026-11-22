@@ -1,98 +1,98 @@
-# HSOC — Consolidamento & Implementation Readiness
+# HSOC — Consolidation & Implementation Readiness
 
-**Versione:** 1.1-draft | **Stato:** gate progettuale prima dell'implementazione
+**Version:** 1.1-draft | **Status:** design gate before implementation
 
-## 1. Obiettivo
+## 1. Objective
 
-Verificare che le specifiche siano abbastanza coerenti da avviare lo sviluppo senza ambiguità critiche. Questo documento non dichiara che il codice sia già stato realizzato.
+Verify that the specifications are coherent enough to start development without critical ambiguity. This document does not declare that the code has already been written.
 
-## 2. Principi obbligatori
+## 2. Mandatory principles
 
-- Local-first e costo minimo.
-- Nessun hardware esterno obbligatorio.
-- Go autorità centrale.
-- SQLite scritto solo da Go.
-- UI separata dal servizio.
-- Minimo privilegio.
-- Privacy e minimizzazione dati.
-- Config validata e versionata.
-- Backup/restore testabili.
-- Tracciabilità requisiti-test.
-- Agenti remoti esclusi dalla V1.
-- Auto-response disattivata.
-- IoT osservato passivamente.
+- Local-first and minimal cost.
+- No mandatory external hardware.
+- Go as central authority.
+- SQLite written only by Go.
+- UI separated from the service.
+- Least privilege.
+- Privacy and data minimization.
+- Validated and versioned config.
+- Testable backup/restore.
+- Requirement-test traceability.
+- Remote agents excluded from V1.
+- Auto-response disabled.
+- IoT observed passively.
 
-## 3. Decisioni da consolidare
+## 3. Decisions to consolidate
 
-| ADR | Tema | Proposta |
+| ADR | Topic | Proposal |
 |---|---|---|
-| ADR-121 | IPC | Named Pipes Windows con ACL; validare identità client |
-| ADR-122 | Rust | Linguaggio approvato per moduli specialistici di sicurezza; definire confini FFI e packaging |
-| ADR-123 | Python | Linguaggio approvato per worker e analisi ausiliarie; definire isolamento e packaging |
-| ADR-124 | Auto-response | OFF nella V1; approvazione esplicita |
-| ADR-125 | Config | Schema versionato e precedence definita |
-| ADR-126 | Fonte di verità | DB per stato runtime; config per bootstrap/preferenze |
-| ADR-127 | Health monitor | Stato per componente e degradazione |
-| ADR-128 | Diagnostics | Export volontario e redatto |
-| ADR-129 | Simulation | Modalità senza effetti sul sistema |
-| ADR-130 | Agenti remoti | Esclusi dalla V1 |
-| ADR-131 | Architettura | Windows x86-64 iniziale |
-| ADR-132 | Windows supportati | Definire e testare matrice OS |
+| ADR-121 | IPC | Windows Named Pipes with ACL; validate client identity |
+| ADR-122 | Rust | Approved language for specialist security modules; define FFI boundaries and packaging |
+| ADR-123 | Python | Approved language for workers and auxiliary analysis; define isolation and packaging |
+| ADR-124 | Auto-response | OFF in V1; explicit approval |
+| ADR-125 | Config | Versioned schema and defined precedence |
+| ADR-126 | Source of truth | DB for runtime state; config for bootstrap/preferences |
+| ADR-127 | Health monitor | Status per component and degradation |
+| ADR-128 | Diagnostics | Voluntary and redacted export |
+| ADR-129 | Simulation | Mode with no effect on the system |
+| ADR-130 | Remote agents | Excluded from V1 |
+| ADR-131 | Architecture | Initial Windows x86-64 |
+| ADR-132 | Supported Windows versions | Define and test the OS matrix |
 
 ## 4. Definition of Ready
 
-Una feature è pronta per sviluppo se:
-- requisito e motivazione sono definiti;
-- versione/priorità sono assegnate;
-- comportamento normale e failure mode sono descritti;
-- dati trattati e privacy sono chiari;
-- minacce e autorizzazioni sono valutate;
-- interfacce e schema sono definiti;
-- test positivi, negativi e recovery sono scritti;
-- dipendenze e limiti sono noti;
-- documenti e matrice tracciabilità sono aggiornati.
+A feature is ready for development if:
+- the requirement and rationale are defined;
+- version/priority are assigned;
+- normal behavior and failure modes are described;
+- processed data and privacy are clear;
+- threats and authorizations are assessed;
+- interfaces and schema are defined;
+- positive, negative, and recovery tests are written;
+- dependencies and limits are known;
+- documents and the traceability matrix are updated.
 
 ## 5. Definition of Done
 
-Una feature è completata solo quando:
-- implementazione e review sono concluse;
-- unit/integration test passano;
-- test security applicabili passano;
-- log/error handling sono adeguati;
-- nessun segreto è esposto;
-- documentazione aggiornata;
-- requisito collegato a test ed evidenza;
-- limiti noti registrati;
-- feature flag/default sicuro impostato;
-- build riproducibile.
+A feature is complete only when:
+- implementation and review are finished;
+- unit/integration tests pass;
+- applicable security tests pass;
+- logging/error handling are adequate;
+- no secret is exposed;
+- documentation is updated;
+- the requirement is linked to tests and evidence;
+- known limits are recorded;
+- a feature flag/safe default is set;
+- the build is reproducible.
 
-## 6. Primo vertical slice
+## 6. First vertical slice
 
-Evento sintetico/OS non distruttivo → collector Go → validazione/normalizzazione → SQLite → regola demo → detection → incident → IPC → dashboard.
+Synthetic/non-destructive OS event → Go collector → validation/normalization → SQLite → demo rule → detection → incident → IPC → dashboard.
 
-Criteri:
-- fixture riproducibile;
-- un solo percorso end-to-end;
-- niente azioni automatiche;
-- DB integro dopo restart;
-- UI non accede al DB;
-- test automatici e report allegati.
+Criteria:
+- reproducible fixture;
+- a single end-to-end path;
+- no automated actions;
+- intact DB after restart;
+- the UI does not access the DB;
+- automated tests and attached reports.
 
-## 7. Piano test per gate
+## 7. Test plan per gate
 
-- Fondamenta: unit test, config, logging, lifecycle.
-- Storage: migrazioni, FK, transazioni, dedup.
-- IPC: autorizzazione, schema, timeout, rate.
-- Detection: fixture positive/negative, metriche.
-- UI: stati, errori, accessibilità.
+- Foundations: unit tests, config, logging, lifecycle.
+- Storage: migrations, FKs, transactions, dedup.
+- IPC: authorization, schema, timeout, rate.
+- Detection: positive/negative fixtures, metrics.
+- UI: states, errors, accessibility.
 - Recovery: backup, restore, crash, disk full.
-- Security: ACL, segreti, update, least privilege.
+- Security: ACLs, secrets, updates, least privilege.
 - Release: installer, upgrade, rollback, SBOM.
 
-## 8. Sequenza di sviluppo
+## 8. Development sequence
 
-1. Repository, standard, CI e documentazione.
-2. Modello dati e migrazioni.
+1. Repository, standards, CI, and documentation.
+2. Data model and migrations.
 3. Service lifecycle/health.
 4. IPC.
 5. Collector/normalizer.
@@ -100,53 +100,53 @@ Criteri:
 7. Dashboard.
 8. Backup/restore.
 9. Inventory/vulnerability checks.
-10. Notifications opt-in.
-11. Hardening e installer.
+10. Opt-in notifications.
+11. Hardening and installer.
 12. Release candidate.
 
-## 9. Rischi bloccanti
+## 9. Blocking risks
 
-- IPC senza autorizzazione robusta.
-- DB scrivibile da più componenti.
-- Nessun restore testato.
-- Servizio con privilegi eccessivi.
-- Update non verificato.
-- Azioni automatiche non approvate.
-- Telemetria IoT sovrastimata.
-- Requisiti P0 senza test.
+- IPC without robust authorization.
+- DB writable by multiple components.
+- No tested restore.
+- Service with excessive privileges.
+- Unverified updates.
+- Unapproved automated actions.
+- Overestimated IoT telemetry.
+- P0 requirements without tests.
 
 ## 10. GO/NO-GO
 
-**GO:** architettura coerente, decisioni P0 chiuse, vertical slice ripetibile, test P0 passati, recovery verificato.  
-**NO-GO:** perdita dati, accesso non autorizzato, segreti esposti, azioni non autorizzate, restore fallito o test critici mancanti.
+**GO:** coherent architecture, closed P0 decisions, repeatable vertical slice, P0 tests passed, verified recovery.  
+**NO-GO:** data loss, unauthorized access, exposed secrets, unauthorized actions, failed restore, or missing critical tests.
 
-## 11. Primo sprint raccomandato
+## 11. Recommended first sprint
 
-- Creare repository e CI.
-- Congelare schema evento canonico e primo schema DB.
-- Prototipare service lifecycle e health.
-- Definire e testare IPC minimo.
-- Implementare vertical slice con fixture.
-- Produrre primo report test e aggiornare matrice.
+- Create the repository and CI.
+- Freeze the canonical event schema and the first DB schema.
+- Prototype the service lifecycle and health.
+- Define and test minimal IPC.
+- Implement the vertical slice with fixtures.
+- Produce the first test report and update the matrix.
 
-## Aggiornamento architetturale 1.1 – decisioni consolidate (15-11-2026)
+## Architectural update 1.1 – consolidated decisions (2026-11-15)
 
-Le seguenti decisioni prevalgono su eventuali formulazioni precedenti in questo documento:
+The following decisions supersede any earlier wording in this document:
 
-- **Licenza del progetto:** MIT. Il testo completo è nel file `LICENSE` alla radice del repository. Le licenze delle dipendenze restano da verificare e rispettare separatamente.
-- **Repository:** monorepo GitHub, con codice, documentazione, test e configurazioni di build nello stesso repository.
-- **Dashboard desktop:** Tauri + React + TypeScript. Il runtime Rust interno a Tauri è distinto dai moduli Rust specialistici HSOC.
-- **Stack applicativo:** Go + Rust + Python. Go è il core e l'unica autorità di scrittura su SQLite; Rust implementa componenti specialistici di sicurezza; Python implementa worker e attività ausiliarie di analisi. Le responsabilità devono restare separate e i confini tra processi/moduli documentati.
-- **Introduzione graduale:** i tre linguaggi fanno parte dello stack approvato, ma le rispettive componenti vengono integrate per fasi verticali verificabili; non si creano cartelle o moduli vuoti e un worker non deve diventare un punto singolo di guasto del core.
-- **Docker:** facoltativo, riservato ad ambienti di sviluppo/test o servizi ausiliari isolati. Non è prerequisito di installazione o funzionamento per l'utente HSOC.
-- **Agenti remoti:** esclusi dalla V1; progettazione e implementazione funzionale dalla V2+. Nella V1 si possono definire contratti e schemi versionati per evitare una futura riprogettazione, senza aprire listener remoti.
-- **Piattaforma iniziale:** Windows x86-64; Linux e macOS restano evoluzioni successive.
-- **Tracciabilità:** requisiti, documenti, componenti, test ed evidenze devono essere collegati nella matrice del Documento 14.
+- **Project license:** MIT. The full text is in the `LICENSE` file at the repository root. Dependency licenses must still be verified and respected separately.
+- **Repository:** GitHub monorepo, with code, documentation, tests, and build configurations in the same repository.
+- **Desktop dashboard:** Tauri + React + TypeScript. The Rust runtime inside Tauri is distinct from the HSOC specialist Rust modules.
+- **Application stack:** Go + Rust + Python. Go is the core and the sole authority for writing to SQLite; Rust implements specialist security components; Python implements workers and auxiliary analysis tasks. Responsibilities must remain separate and process/module boundaries documented.
+- **Gradual introduction:** the three languages are part of the approved stack, but their components are integrated in verifiable vertical phases; no empty folders or modules are created, and a worker must not become a single point of failure for the core.
+- **Docker:** optional, reserved for development/test environments or isolated auxiliary services. It is not a prerequisite for installation or operation for the HSOC user.
+- **Remote agents:** excluded from V1; design and functional implementation from V2+. V1 may define versioned contracts and schemas to avoid a future redesign, without opening remote listeners.
+- **Initial platform:** Windows x86-64; Linux and macOS remain subsequent evolutions.
+- **Traceability:** requirements, documents, components, tests, and evidence must be linked in the Document 14 matrix.
 
-Queste decisioni aggiornano la baseline progettuale, non attestano che codice, workflow CI, installer o test siano già stati implementati o verificati.
+These decisions update the design baseline; they do not attest that code, CI workflows, installers, or tests have already been implemented or verified.
 
-### Gate di prontezza aggiornato
+### Updated readiness gate
 
-La scelta dello stack Go + Rust + Python e della dashboard Tauri + React + TypeScript è confermata. Prima di iniziare ciascun modulo vanno comunque definiti contratto, input/output, failure mode, dipendenze, packaging e test. Il fatto che un linguaggio sia approvato non autorizza un modulo privo di requisito o di responsabilità chiara.
+The choice of the Go + Rust + Python stack and the Tauri + React + TypeScript dashboard is confirmed. Before starting each module, the contract, input/output, failure modes, dependencies, packaging, and tests must still be defined. The fact that a language is approved does not authorize a module without a requirement or a clear responsibility.
 
-Docker resta facoltativo per sviluppo/test. La V1 resta locale e Windows-first; agenti remoti soltanto dalla V2.
+Docker remains optional for development/testing. V1 remains local and Windows-first; remote agents only from V2.

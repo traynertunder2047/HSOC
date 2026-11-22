@@ -1,3 +1,3 @@
 # tests/integration
 
-Test d'integrazione tra componenti.
+Integration tests between components.

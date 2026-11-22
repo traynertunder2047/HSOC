@@ -1,112 +1,112 @@
 # HSOC — Configuration & Policy Specification
 
-**Versione:** 1.1-draft
+**Version:** 1.1-draft
 
-## 1. Scopo
+## 1. Purpose
 
-Separare preferenze operative, configurazione tecnica, stato runtime e segreti. Una singola fonte di verità deve essere definita per ogni categoria di dato.
+Separate operational preferences, technical configuration, runtime state, and secrets. A single source of truth must be defined for each data category.
 
-## 2. Categorie
+## 2. Categories
 
-- **Config file:** impostazioni statiche e bootstrap, schema versionato.
-- **Database:** stato runtime, eventi, incidenti, audit, inventario, stato backup.
-- **OS Credential Store:** token e segreti.
-- **Policy:** limiti di sicurezza e autorizzazioni.
-- **Environment/build:** valori non segreti necessari a packaging/test.
+- **Config file:** static settings and bootstrap, versioned schema.
+- **Database:** runtime state, events, incidents, audit, inventory, backup status.
+- **OS Credential Store:** tokens and secrets.
+- **Policy:** security limits and authorizations.
+- **Environment/build:** non-secret values needed for packaging/testing.
 
-Non duplicare la stessa impostazione in più fonti senza regola di precedence.
+Do not duplicate the same setting across multiple sources without a precedence rule.
 
-## 3. Precedence proposta
+## 3. Proposed precedence
 
-1. Vincoli di sicurezza incorporati e non disattivabili.
-2. Policy amministrative locali documentate.
-3. Configurazione locale valida.
-4. Default di prodotto.
+1. Built-in, non-disableable security constraints.
+2. Documented local administrative policies.
+3. Valid local configuration.
+4. Product defaults.
 
-Ordine finale da confermare con ADR-125. Nessuna variabile ambiente o argomento CLI deve poter disabilitare silenziosamente i controlli di sicurezza.
+Final order to be confirmed with ADR-125. No environment variable or CLI argument may silently disable security controls.
 
 ## 4. Schema
 
-Ogni campo deve avere:
-- nome e tipo;
+Every field must have:
+- name and type;
 - default;
 - range;
-- valore ammesso;
-- descrizione;
-- rischio;
-- versione schema;
-- effetto del reload;
-- eventuale restart richiesto.
+- allowed value;
+- description;
+- risk;
+- schema version;
+- reload effect;
+- any required restart.
 
-## 5. Default sicuri
+## 5. Secure defaults
 
 - Telegram: OFF.
-- Risposta automatica: OFF.
-- Agenti remoti: OFF/non presenti in V1.
-- Listener di rete: assente per default.
-- Export esterno: OFF.
-- Moduli opzionali: OFF se non installati.
-- Log: senza segreti.
-- Privilegi: minimi.
+- Automated response: OFF.
+- Remote agents: OFF/not present in V1.
+- Network listener: absent by default.
+- External export: OFF.
+- Optional modules: OFF when not installed.
+- Logs: no secrets.
+- Privileges: minimal.
 
-## 6. Modifiche
+## 6. Changes
 
-- Validare interamente prima dell'applicazione.
-- Applicare atomicamente.
-- Se invalida, conservare ultima configurazione valida.
-- Auditare cambi sensibili.
-- Mostrare diff e impatto.
-- Supportare rollback.
-- Non cambiare policy di risposta senza conferma.
+- Validate entirely before applying.
+- Apply atomically.
+- If invalid, keep the last valid configuration.
+- Audit sensitive changes.
+- Show diff and impact.
+- Support rollback.
+- Do not change response policies without confirmation.
 
 ## 7. Feature flags
 
-Le feature flag non sono un controllo di sicurezza. Non devono essere usate per nascondere controlli obbligatori. Ogni flag deve avere owner, stato default, versione di introduzione, criterio di rimozione e test.
+Feature flags are not a security control. They must not be used to hide mandatory controls. Every flag must have an owner, default state, introduction version, removal criterion, and tests.
 
-## 8. Test configurazione
+## 8. Configuration tests
 
-| ID | Test | Risultato atteso |
+| ID | Test | Expected result |
 |---|---|---|
-| CFG-01 | Primo avvio senza config | Default sicuri |
-| CFG-02 | Config valida | Caricamento riuscito |
-| CFG-03 | Config malformata | Errore chiaro, fallback sicuro |
-| CFG-04 | Campo sconosciuto | Policy di compatibilità documentata |
-| CFG-05 | Valore fuori range | Rifiuto |
-| CFG-06 | Override di vincolo obbligatorio | Rifiuto |
-| CFG-07 | Reload config valida | Applicazione atomica |
-| CFG-08 | Reload fallita | Ultima config valida conservata |
-| CFG-09 | Segreto in config file | Non consentito o migrazione a Credential Store |
-| CFG-10 | Telegram default | Disattivato |
-| CFG-11 | Auto-response default | Disattivata |
-| CFG-12 | Audit cambio policy | Evento audit presente |
-| CFG-13 | Backup config | Config ripristinabile |
-| CFG-14 | Rollback config | Versione precedente ripristinata |
-| CFG-15 | Restart richiesto | UI comunica necessità e stato |
+| CFG-01 | First start without config | Secure defaults |
+| CFG-02 | Valid config | Successful load |
+| CFG-03 | Malformed config | Clear error, safe fallback |
+| CFG-04 | Unknown field | Documented compatibility policy |
+| CFG-05 | Out-of-range value | Rejection |
+| CFG-06 | Override of a mandatory constraint | Rejection |
+| CFG-07 | Valid config reload | Atomic application |
+| CFG-08 | Failed reload | Last valid config preserved |
+| CFG-09 | Secret in config file | Not allowed, or migration to Credential Store |
+| CFG-10 | Telegram default | Disabled |
+| CFG-11 | Auto-response default | Disabled |
+| CFG-12 | Policy change audit | Audit event present |
+| CFG-13 | Config backup | Config restorable |
+| CFG-14 | Config rollback | Previous version restored |
+| CFG-15 | Restart required | UI reports the need and status |
 
-## 9. Questioni aperte
+## 9. Open questions
 
-- Fonte di verità runtime per ogni impostazione.
-- Formato config (TOML/YAML/JSON) e schema.
-- Policy locale e possibili profili.
-- Gestione config multi-versione.
-- Secret store per ogni piattaforma futura.
+- Runtime source of truth for each setting.
+- Config format (TOML/YAML/JSON) and schema.
+- Local policy and possible profiles.
+- Multi-version config handling.
+- Secret store for each future platform.
 
-## Aggiornamento architetturale 1.1 – decisioni consolidate (15-11-2026)
+## Architectural update 1.1 – consolidated decisions (2026-11-15)
 
-Le seguenti decisioni prevalgono su eventuali formulazioni precedenti in questo documento:
+The following decisions supersede any earlier wording in this document:
 
-- **Licenza del progetto:** MIT. Il testo completo è nel file `LICENSE` alla radice del repository. Le licenze delle dipendenze restano da verificare e rispettare separatamente.
-- **Repository:** monorepo GitHub, con codice, documentazione, test e configurazioni di build nello stesso repository.
-- **Dashboard desktop:** Tauri + React + TypeScript. Il runtime Rust interno a Tauri è distinto dai moduli Rust specialistici HSOC.
-- **Stack applicativo:** Go + Rust + Python. Go è il core e l'unica autorità di scrittura su SQLite; Rust implementa componenti specialistici di sicurezza; Python implementa worker e attività ausiliarie di analisi. Le responsabilità devono restare separate e i confini tra processi/moduli documentati.
-- **Introduzione graduale:** i tre linguaggi fanno parte dello stack approvato, ma le rispettive componenti vengono integrate per fasi verticali verificabili; non si creano cartelle o moduli vuoti e un worker non deve diventare un punto singolo di guasto del core.
-- **Docker:** facoltativo, riservato ad ambienti di sviluppo/test o servizi ausiliari isolati. Non è prerequisito di installazione o funzionamento per l'utente HSOC.
-- **Agenti remoti:** esclusi dalla V1; progettazione e implementazione funzionale dalla V2+. Nella V1 si possono definire contratti e schemi versionati per evitare una futura riprogettazione, senza aprire listener remoti.
-- **Piattaforma iniziale:** Windows x86-64; Linux e macOS restano evoluzioni successive.
-- **Tracciabilità:** requisiti, documenti, componenti, test ed evidenze devono essere collegati nella matrice del Documento 14.
+- **Project license:** MIT. The full text is in the `LICENSE` file at the repository root. Dependency licenses must still be verified and respected separately.
+- **Repository:** GitHub monorepo, with code, documentation, tests, and build configurations in the same repository.
+- **Desktop dashboard:** Tauri + React + TypeScript. The Rust runtime inside Tauri is distinct from the HSOC specialist Rust modules.
+- **Application stack:** Go + Rust + Python. Go is the core and the sole authority for writing to SQLite; Rust implements specialist security components; Python implements workers and auxiliary analysis tasks. Responsibilities must remain separate and process/module boundaries documented.
+- **Gradual introduction:** the three languages are part of the approved stack, but their components are integrated in verifiable vertical phases; no empty folders or modules are created, and a worker must not become a single point of failure for the core.
+- **Docker:** optional, reserved for development/test environments or isolated auxiliary services. It is not a prerequisite for installation or operation for the HSOC user.
+- **Remote agents:** excluded from V1; design and functional implementation from V2+. V1 may define versioned contracts and schemas to avoid a future redesign, without opening remote listeners.
+- **Initial platform:** Windows x86-64; Linux and macOS remain subsequent evolutions.
+- **Traceability:** requirements, documents, components, tests, and evidence must be linked in the Document 14 matrix.
 
-Queste decisioni aggiornano la baseline progettuale, non attestano che codice, workflow CI, installer o test siano già stati implementati o verificati.
+These decisions update the design baseline; they do not attest that code, CI workflows, installers, or tests have already been implemented or verified.
 
-### Configurazione dei componenti multi-linguaggio
+### Configuration of multi-language components
 
-Le configurazioni dei worker Rust/Python devono essere subordinate alla policy e alla configurazione validate dal servizio Go. I worker non possono ridefinire i controlli di sicurezza, abilitare listener remoti o modificare autonomamente le policy di risposta. I parametri specifici di packaging/runtime sono separati dalle preferenze dell'utente e non devono contenere segreti.
+The configuration of Rust/Python workers must be subordinate to the policy and configuration validated by the Go service. Workers cannot redefine security controls, enable remote listeners, or autonomously modify response policies. Packaging/runtime-specific parameters are separate from user preferences and must not contain secrets.

@@ -1,3 +1,3 @@
 # rules/iot
 
-Osservazione passiva dei dispositivi IoT, nei limiti dei dati disponibili.
+Passive observation of IoT devices, within the limits of the available data.

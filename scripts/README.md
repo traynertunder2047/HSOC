@@ -1,3 +1,3 @@
 # scripts
 
-Script riproducibili per sviluppo, test, packaging e manutenzione.
+Reproducible scripts for development, testing, packaging, and maintenance.

@@ -1,24 +1,24 @@
 # HSOC — Home Security Operations Center
 
-HSOC è progettato come applicazione desktop local-first per la sicurezza informatica domestica.
+HSOC is designed as a local-first desktop application for home cybersecurity.
 
-## Baseline approvata
-- Core e servizio: Go (unico writer del database SQLite).
-- Moduli specialistici: Rust.
-- Worker e analisi ausiliarie: Python.
+## Approved baseline
+- Core and service: Go (the only writer of the SQLite database).
+- Specialist modules: Rust.
+- Workers and auxiliary analysis: Python.
 - Dashboard: Tauri + React + TypeScript.
-- Database: SQLite locale.
-- Docker: facoltativo, per sviluppo e test.
-- V1: agente locale, Windows-first.
-- V2+: agenti remoti.
+- Database: local SQLite.
+- Docker: optional, for development and testing.
+- V1: local agent, Windows-first.
+- V2+: remote agents.
 
-## Stato del repository
-Questo repository contiene lo scheletro iniziale e la documentazione di progetto.
-Le cartelle con `README.md` sono segnaposto organizzativi: non indicano che le funzionalità siano già implementate.
-I workflow CI saranno attivati e completati quando i rispettivi moduli e manifest di dipendenze saranno presenti.
+## Repository status
+This repository contains the initial skeleton and the project documentation.
+Folders with a `README.md` are organizational placeholders: they do not indicate that the features are already implemented.
+CI workflows will be enabled and completed once the respective modules and dependency manifests are present.
 
-## Documentazione
-Vedere [`docs/00_INDICE_PACCHETTO.md`](docs/00_INDICE_PACCHETTO.md).
+## Documentation
+See [`docs/00_PACKET_INDEX.md`](docs/00_PACKET_INDEX.md).
 
-## Licenza
-MIT — vedere [`LICENSE`](LICENSE).
+## License
+MIT — see [`LICENSE`](LICENSE).

@@ -1,3 +1,3 @@
 # database/queries
 
-Query e note di accesso ai dati; il servizio Go resta l'unico writer.
+Queries and data access notes; the Go service remains the only writer.

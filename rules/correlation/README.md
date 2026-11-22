@@ -1,3 +1,3 @@
 # rules/correlation
 
-Regole di correlazione degli eventi.
+Event correlation rules.
